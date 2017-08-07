@@ -143,7 +143,7 @@ class ItemEdit(Item):
 ItemEdit()
 
 
-class DeleteItem(Item):
+class ItemDelete(Item):
     name = "Delete"
     parent = item
     _args = ('yes', )
@@ -154,7 +154,7 @@ class DeleteItem(Item):
         if "y" in args[0].lower():
             menu.delete_item()
 
-DeleteItem()
+ItemDelete()
 
 
 class Create(BaseCommand):

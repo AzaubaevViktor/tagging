@@ -55,6 +55,10 @@ class TagManager:
                 self.delete_item(child)
             for entry in item.entries:
                 entry.remove_tag(item)
+        elif isinstance(item, SimpleEntry):
+            for tag in item.tags:
+                tag.remove_entry(item)
+
 
 
 

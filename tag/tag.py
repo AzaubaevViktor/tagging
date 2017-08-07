@@ -12,7 +12,7 @@ class Tag(anytree.NodeMixin):
     def __init__(self, name, parent=None):
         super().__init__()
         self.name = name
-        self._entries = set() # type: Set[SimpleEntry]
+        self._entries = set()  # type: Set[SimpleEntry]
         self.parent = parent
         self._manager = None
 
@@ -28,6 +28,9 @@ class Tag(anytree.NodeMixin):
         if entry not in self._entries:
             self._entries.add(entry)
             entry.add_tag(self)
+
+    def remove_entry(self, entry: "SimpleEntry"):
+        self._entries.remove(entry)
 
     @property
     def item(self):
