@@ -3,6 +3,7 @@ import abc
 from typing import List
 
 from settings import HELLO_HEADER
+from curses_wrapper import colors
 
 KEY_ESC = 27
 
@@ -15,7 +16,7 @@ class AbstractItemType(metaclass=abc.ABCMeta):
         pass
 
 
-class Item:
+class SimpleItem:
     def __init__(self,
                  name: str,
                  comment: str
@@ -26,32 +27,10 @@ class Item:
 
 class Menu:
     def __init__(self, stdscr):
-        self._init_curses(stdscr)
-
-        self._items = []  # type: List[Item]
-        self._active_item = 0
-
-    def _init_curses(self, stdscr):
         self.stdscr = stdscr
-        curses.start_color()
-        curses.use_default_colors()
 
-        self._init_colors()
-
-        self.stdscr.clear()
-        curses.noecho()
-        curses.cbreak()
-        self.stdscr.keypad(True)
-
-    def _init_colors(self):
-        curses.init_pair(1, -1, 0)  # White on Black
-        self.TEXT = curses.color_pair(1)
-
-        curses.init_pair(2, 0, 7)  # Black on White
-        self.ACTIVE_TEXT = curses.color_pair(2)
-
-        curses.init_pair(3, 8, 0)  # Gray on Black
-        self.COMMENT = curses.color_pair(3)
+        self._items = []  # type: List[SimpleItem]
+        self._active_item = 0
 
     @property
     def width(self):
@@ -86,22 +65,24 @@ class Menu:
         self.stdscr.addstr(0, self.width - len(HELLO_HEADER) - 1, HELLO_HEADER)
 
         for i, item in enumerate(self.items):
-            color = self.ACTIVE_TEXT if i == self.active_item else self.TEXT
-            y = (i + 1) * 3
-            self.stdscr.addstr(y, 0, item.name, color)
-            self.stdscr.addstr(y + 1, 2, item.comment[:30], self.COMMENT)
+            color = colors.ACTIVE_TEXT if i == self.active_item else colors.TEXT
+            y = (i + 1) * 2
+            self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
+            self.stdscr.addstr(y + 1, 2, item.comment[:30], colors.COMMENT)
 
     def key_handle(self, key):
+        key = ord(key) if isinstance(key, str) else key
+
         if curses.KEY_DOWN == key:
             self.active_item += 1
         elif curses.KEY_UP == key:
             self.active_item -= 1
-        elif KEY_ESC == key or ord('q') == key:
+        elif KEY_ESC == key:
             return NEED_EXIT
 
         return NEED_KEY
 
-    def redraw(self):
+    def refresh(self):
         self.stdscr.refresh()
 
     def __del__(self):
