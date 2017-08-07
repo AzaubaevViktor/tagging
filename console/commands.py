@@ -1,5 +1,5 @@
 from menu import SimpleItem
-from tag import SimpleEntry
+from tag import SimpleEntry, LinkEntry
 
 
 class BaseCommand:
@@ -39,7 +39,7 @@ create = Create()
 
 class CreateEntry(BaseCommand):
     char = 'e'
-    _about = 'Create Entry: [Simple]'
+    _about = 'Create Entry: [Simple Link]'
     parent = create
 
 create_entry = CreateEntry()
@@ -60,8 +60,30 @@ class CreateEntrySimple(BaseCommand):
         )
 
     def __call__(self, stdscr, menu: "Menu", console: "Console", args):
-        entry = SimpleEntry(args[0], args[1], [])
+        entry = SimpleEntry(args[0], args[1])
         menu.manager.add_item_to_cur_tag(entry)
         menu.update_items()
 
 CreateEntrySimple()
+
+
+class CreateEntryLink(BaseCommand):
+    char = 'l'
+    _about = 'Create Entry Link <link>; <comment>'
+    parent = create_entry
+
+    def about(self, link="", comment=""):
+        return self._about.replace(
+            "<link>",
+            "<link:{}>".format(link)
+        ).replace(
+            "<comment>",
+            "<comment:{}>".format(comment)
+        )
+
+    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+        entry = LinkEntry(args[0], args[1])
+        menu.manager.add_item_to_cur_tag(entry)
+        menu.update_items()
+
+CreateEntryLink()

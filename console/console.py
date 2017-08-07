@@ -13,18 +13,30 @@ class Console:
         self.line = ""
         self.a = 0
         self.menu = None  # type: "Menu"
+        self.is_handle_key = False
 
     def key_handle(self, key):
+        self.is_handle_key = False
 
         if isinstance(key, str):
             if "\n" == key:
-                self.run()
-                self.line = ""
+                if self.line:
+                    self.run()
+                    self.line = ""
+                    self.is_handle_key = True
+            elif 27 == ord(key):
+                if self.line:
+                    self.line = ""
+                    self.is_handle_key = True
             else:
                 self.line += key
+                self.is_handle_key = True
+
         else:
+
             if curses.KEY_BACKSPACE == key:
                 self.line = self.line[:-1]
+                self.is_handle_key = True
 
     @property
     def args(self):

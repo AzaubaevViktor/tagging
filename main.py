@@ -44,8 +44,9 @@ def main(stdscr):
 
         key = stdscr.get_wch()
 
-        status = menu.key_handle(key)
         console.key_handle(key)
+        if not console.is_handle_key:
+            status = menu.key_handle(key)
 
 
 

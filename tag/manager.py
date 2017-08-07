@@ -1,7 +1,7 @@
 from typing import List
 import anytree
 
-from menu import SimpleItem, TagItem
+from menu import SimpleItem, TagItem, LinkItem
 
 
 class TagManager:
@@ -76,11 +76,11 @@ class Tag(anytree.NodeMixin):
 
 
 class SimpleEntry:
-    def __init__(self, name: str, comment: str, tags: List[Tag]):
+    def __init__(self, name: str, comment: str, tags: List[Tag] = None):
         self.name = name
         self.comment = comment
         self._tags = set()
-        self.add_tags(tags)
+        self.add_tags(tags or [])
 
     @property
     def tags(self):
@@ -98,4 +98,16 @@ class SimpleEntry:
     @property
     def item(self):
         return SimpleItem(self.name, self.comment)
+
+
+class LinkEntry(SimpleEntry):
+    def __init__(self, link: str, comment: str):
+        self.link = link
+        name = link
+        super().__init__(name, comment)
+
+    @property
+    def item(self):
+        return LinkItem(self.name, self.comment, self.link)
+
 
