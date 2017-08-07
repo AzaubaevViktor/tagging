@@ -11,11 +11,12 @@ KEY_ENTER = 10
 
 
 class Menu:
+
     def __init__(self, stdscr, tag_manager: "TagManager"):
         self.stdscr = stdscr
         self.manager = tag_manager
 
-        self._items = []  # type: List["AbstractItem"]
+        self._items = []  # type: List["AbstractItemType"]
 
         self.update_items()
 
@@ -56,7 +57,7 @@ class Menu:
             self._pos = value % length
 
     @property
-    def active_item(self) -> "AbstractItem":
+    def active_item(self) -> "menu.AbstractItemType":
         return self.items[self.pos]
 
     def delete_item(self):
@@ -76,7 +77,7 @@ class Menu:
 
             y = (i + 1) * 2
             self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
-            self.stdscr.addstr(y + 1, 2, item.comment[:30], colors.COMMENT)
+            self.stdscr.addstr(y + 1, 2, item.comment, colors.COMMENT)
 
     def key_handle(self, key):
         key = ord(key) if isinstance(key, str) else key

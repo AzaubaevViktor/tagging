@@ -61,6 +61,7 @@ class TagManager:
 
 class Tag(anytree.NodeMixin):
     separator = " > "
+    fields = ('name', )
 
     def __init__(self, name, parent=None):
         super().__init__()
@@ -88,6 +89,8 @@ class Tag(anytree.NodeMixin):
 
 
 class SimpleEntry:
+    fields = ('name', 'comment')
+
     def __init__(self, name: str, comment: str, tags: List[Tag] = None):
         self.name = name
         self.comment = comment
@@ -116,6 +119,8 @@ class SimpleEntry:
 
 
 class LinkEntry(SimpleEntry):
+    fields = ('link', 'comment')
+
     def __init__(self, link: str, comment: str, tags: List[Tag] = None):
         self.link = link
         if "http://" not in self.link:
@@ -130,6 +135,8 @@ class LinkEntry(SimpleEntry):
 
 
 class FileEntry(SimpleEntry):
+    fields = ('path', 'comment')
+
     def __init__(self, path: str, comment: str, tags: List[Tag] = None):
         self.path = path
         super().__init__(path.split("/")[-1], comment, tags)

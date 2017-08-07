@@ -1,4 +1,9 @@
+import curses
+import curses.ascii
 import itertools as it
+from curses.textpad import rectangle, Textbox
+
+from .my_textpad import MyTextPad
 from tag import SimpleEntry, LinkEntry
 from tag.manager import FileEntry, Tag
 
@@ -18,7 +23,7 @@ class BaseCommand:
         if self.parent is not None:
             self.parent.childrens[self.char] = self
 
-    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+    def __call__(self, *args, **kwargs):
         pass
 
     def console_path(self):
@@ -43,8 +48,11 @@ class BaseCommand:
 
         return pre + ": " + variantes
 
-    def about(self, *args):
-        _args = {key: value or "" for key, value in it.zip_longest(self._args, args)}
+    def arguments(self, *args, **kwargs):
+        return {key: value or "" for key, value in it.zip_longest(self._args, args)}
+
+    def about(self, *args, **kwargs):
+        _args = self.arguments(*args, **kwargs)
 
         about = self._about or self.console_path()
 
@@ -77,12 +85,72 @@ class Item(BaseCommand):
 item = Item()
 
 
+class ItemEdit(Item):
+    name = "Edit"
+    parent = item
+
+    _args = ('field', )
+
+    box_size = (0.8, 0.8)
+
+    def arguments(self, *args, **kwargs):
+        _args = super().arguments(*args, **kwargs)
+        field_value = _args['field']
+        menu = kwargs['menu']  # type: "Menu"
+        entry = menu.active_item.source  # type: "SimpleEntry"
+
+        for field_name in entry.fields:
+            if field_name.startswith(field_value):
+                _args['field'] = field_name
+
+        return _args
+
+    def __call__(self, *args, **kwargs):
+        args = self.arguments(*args, **kwargs)
+        field_name = args['field']
+        menu = kwargs['menu']
+        item = menu.active_item.source
+
+        stdscr = kwargs['stdscr']
+
+        my, mx = stdscr.getmaxyx()
+        sy = int(my * self.box_size[0])
+        sx = int(mx * self.box_size[1])
+
+        starty = (my - sy) // 2
+        startx = (mx - sx) // 2
+
+        header = "Edit field `{}`:".format(field_name)
+
+        stdscr.addstr(starty, startx + (sx - len(header)) // 2, header)
+
+        editwin = curses.newwin(sy - 3, sx - 1, starty + 2, startx + 1)
+        rectangle(stdscr, starty + 1, startx, starty + sy, startx + sx)
+        stdscr.refresh()
+
+        box = MyTextPad(editwin, getattr(item, field_name))
+
+        # Let the user edit until Ctrl-G is struck.
+        box.edit()
+
+        # Get resulting contents
+        message = box.gather()
+
+        setattr(item, field_name, message)
+
+        menu.update_items()
+
+ItemEdit()
+
+
 class DeleteItem(Item):
     name = "Delete"
     parent = item
     _args = ('yes', )
 
-    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+    def __call__(self, *args, **kwargs):
+        menu = kwargs['menu']
+
         if "y" in args[0].lower():
             menu.delete_item()
 
@@ -102,7 +170,9 @@ class CreateTag(Create):
 
     _args = ("name", )
 
-    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+    def __call__(self, *args, **kwargs):
+        menu = kwargs['menu']
+
         tag = Tag(args[0])
         menu.add_item(tag)
 
@@ -115,7 +185,9 @@ class CreateEntry(BaseCommand):
 
     entry_class = None
 
-    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+    def __call__(self, *args, **kwargs):
+        menu = kwargs['menu']
+
         if self.entry_class is None:
             return
 

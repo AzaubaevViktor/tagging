@@ -63,7 +63,7 @@ class Console:
         if not cmd:
             hlp = "Unknown command. Enter `h` for help"
         else:
-            hlp = cmd.about(*self.args)
+            hlp = cmd.about(*self.args, **self.env)
 
         return hlp
 
@@ -76,13 +76,22 @@ class Console:
         self.win.addstr(1, 0, line, colors.TEXT)
         self.win.addstr(2, 0, self.get_help(), colors.COMMENT)
 
+    @property
+    def env(self):
+        return {
+            'stdscr': self.stdscr,
+            'menu': self.menu,
+            'manager': self.menu.manager,
+            'console': self
+        }
+
     def run(self):
         cmd = self.cmd
 
         if not cmd:
             return False
         else:
-            cmd(self.stdscr, self.menu, self, self.args)
+            cmd(*self.args, **self.env)
             return True
 
     def refresh(self):
