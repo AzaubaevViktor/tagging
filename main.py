@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import locale
+
+from tag import TagManager
+
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
@@ -20,14 +23,19 @@ def main(stdscr):
 
     cw.init(stdscr)
 
-    menu = Menu(stdscr)
-    menu.items = [item1, item2, item3, link, file]
+    tag_manager = TagManager()
+
+    menu = Menu(stdscr, tag_manager)
+    # menu.items = [item1, item2, item3, link, file]
 
     console = Console(stdscr)
     console.menu = menu
 
     status = NEED_KEY
     while NEED_KEY == status:
+
+        stdscr.clear()
+
         menu.render()
         console.render()
 

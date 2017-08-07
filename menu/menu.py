@@ -10,10 +10,14 @@ KEY_ENTER = 10
 
 
 class Menu:
-    def __init__(self, stdscr):
+    def __init__(self, stdscr, tag_manager: "TagManager"):
         self.stdscr = stdscr
+        self.manager = tag_manager
 
-        self._items = []  # type: List[SimpleItem]
+        self._items = []  # type: List["AbstractItem"]
+
+        self.update_items()
+
         self._active_item = 0
 
     @property
@@ -23,6 +27,9 @@ class Menu:
     @property
     def height(self):
         return self.stdscr.getmaxyx()[0]
+
+    def update_items(self):
+        self.items = self.manager.items
 
     @property
     def items(self):
@@ -55,7 +62,7 @@ class Menu:
             color = colors.ACTIVE_TEXT if i == self.active_item else colors.TEXT
             y = (i + 1) * 2
             self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
-            self.stdscr.addstr(y + 1, 2, item.comment[:30], colors.COMMENT)
+            self.stdscr.addstr(y + 1, 2, "{}".format(item) + " " + item.comment[:30], colors.COMMENT)
 
     def key_handle(self, key):
         key = ord(key) if isinstance(key, str) else key
@@ -68,6 +75,7 @@ class Menu:
             return NEED_EXIT
         elif KEY_ENTER == key:
             self.items[self.active_item].press()
+            self.update_items()
 
         return NEED_KEY
 

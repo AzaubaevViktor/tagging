@@ -48,3 +48,18 @@ class FileItem(AbstractItemType):
 
     def press(self):
         subprocess.run(['xdg-open', self.address])
+
+
+class TagItem(AbstractItemType):
+    def __init__(
+            self,
+            tag: "Tag",
+            tag_manager: "TagManager"
+    ):
+        self.tag = tag
+        self.name = tag.name
+        self.comment = "Tag"
+        self.manager = tag_manager
+
+    def press(self):
+        self.manager.active_tag = self.tag
