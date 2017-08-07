@@ -12,8 +12,6 @@ class MyTextPad(Textbox):
         self._pos = len(default)
         self.refresh()
 
-        self.just_started = True
-
     @property
     def pos(self):
         return self._pos
@@ -58,7 +56,6 @@ class MyTextPad(Textbox):
         elif curses.KEY_UP == ordch:
             self.pos -= self.maxx
         elif '\n' == ch:
-            if not self.just_started:
                 return 0
         elif 27 == ordch:
             return -1
@@ -66,7 +63,6 @@ class MyTextPad(Textbox):
             self.line = self.line[:self.pos] + ch + self.line[self.pos:]
             self.pos += 1
 
-        self.just_started = False
         return True
 
     def gather(self):

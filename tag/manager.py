@@ -1,5 +1,6 @@
 from typing import List, Set
 import anytree
+import lxml.html
 
 from menu import SimpleItem, TagItem, LinkItem, AbstractItemType, FileItem
 
@@ -122,12 +123,28 @@ class LinkEntry(SimpleEntry):
     fields = ('link', 'comment')
 
     def __init__(self, link: str, comment: str, tags: List[Tag] = None):
+        self._link = ""
         self.link = link
-        if "http://" not in self.link:
-            self.link = "http://" + self.link
 
-        name = self.link
-        super().__init__(name, comment, tags)
+        super().__init__(self.name, comment, tags)
+
+    @property
+    def link(self):
+        return self._link
+
+    @link.setter
+    def link(self, val):
+        val = str(val)
+        if "http://" not in val:
+            val = "http://" + val
+
+        try:
+            t = lxml.html.parse(val)
+            self.name = t.find(".//title").text
+        except Exception:
+            self.name = val
+
+        self._link = val
 
     @property
     def item(self) -> AbstractItemType:
