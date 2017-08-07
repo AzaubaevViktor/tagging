@@ -6,20 +6,20 @@ from menu import SimpleItem, TagItem
 
 class TagManager:
     def __init__(self):
-        self.root_tag = Tag(0, "")
+        self.root_tag = Tag("")
         self.root_tag._manager = self
 
-        t1 = Tag(1, "FirstTag", parent=self.root_tag)
-        t2 = Tag(2, "SecondTag", parent=self.root_tag)
-        t11 = Tag(3, "InsideTag", parent=t1)
+        t1 = Tag("FirstTag", parent=self.root_tag)
+        t2 = Tag("SecondTag", parent=self.root_tag)
+        t11 = Tag("InsideTag", parent=t1)
 
         self.entries = [
-            Entry(1, "First Text", "Comment1 bI, root_tag", [self.root_tag]),
-            Entry(2, "Second Text", "Comment1 bI, t1", [t1]),
-            Entry(3, "Third Text", "Comment1 bI, t2", [t2]),
-            Entry(4, "Fourth Text", "Comment1 bI, t11", [t11]),
-            Entry(5, "Fifth Text", "Comment1 bI, t1, t2", [t1, t2]),
-            Entry(6, "Sixth Text", "Comment1 bI, t2, t11", [t2, t11]),
+            SimpleEntry("First Text", "Comment1 bI, root_tag", [self.root_tag]),
+            SimpleEntry("Second Text", "Comment1 bI, t1", [t1]),
+            SimpleEntry("Third Text", "Comment1 bI, t2", [t2]),
+            SimpleEntry("Fourth Text", "Comment1 bI, t11", [t11]),
+            SimpleEntry("Fifth Text", "Comment1 bI, t1, t2", [t1, t2]),
+            SimpleEntry("Sixth Text", "Comment1 bI, t2, t11", [t2, t11]),
         ]
 
         self.active_tag = self.root_tag
@@ -43,13 +43,15 @@ class TagManager:
         tag = self.active_tag
         return tag.separator.join([str(node.name) for node in tag.path]) or tag.separator
 
+    def add_item_to_cur_tag(self, item: "AbstractItem"):
+        item.add_tag(self.active_tag)
+
 
 class Tag(anytree.NodeMixin):
     separator = " > "
 
-    def __init__(self, _id, name, parent=None):
+    def __init__(self, name, parent=None):
         super().__init__()
-        self._id = _id
         self.name = name
         self._entries = set()
         self.parent = parent
@@ -63,7 +65,7 @@ class Tag(anytree.NodeMixin):
     def entries(self):
         return self._entries
 
-    def add_entry(self, entry: "Entry"):
+    def add_entry(self, entry: "SimpleEntry"):
         if entry not in self._entries:
             self._entries.add(entry)
             entry.add_tag(self)
@@ -73,11 +75,8 @@ class Tag(anytree.NodeMixin):
         return TagItem(self, self.manager)
 
 
-
-
-class Entry:
-    def __init__(self, _id: int, name: str, comment: str, tags: List[Tag]):
-        self._id = _id
+class SimpleEntry:
+    def __init__(self, name: str, comment: str, tags: List[Tag]):
         self.name = name
         self.comment = comment
         self._tags = set()

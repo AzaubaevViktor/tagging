@@ -1,9 +1,10 @@
 from menu import SimpleItem
+from tag import SimpleEntry
 
 
 class BaseCommand:
     char = ""
-    _about = 'Enter `h` for Help'
+    _about = ': [Help Create]'
     parent = None  # type: "Command"
 
     def __init__(self):
@@ -30,16 +31,24 @@ HelpCommand()
 
 class Create(BaseCommand):
     char = 'c'
-    _about = "Create: Item"
+    _about = "Create: [Entry]"
     parent = base_cmd
 
 create = Create()
 
 
-class CreateItem(BaseCommand):
-    char = 'i'
-    _about = 'Create Item "<name>" "<comment>"'
+class CreateEntry(BaseCommand):
+    char = 'e'
+    _about = 'Create Entry: [Simple]'
     parent = create
+
+create_entry = CreateEntry()
+
+
+class CreateEntrySimple(BaseCommand):
+    char = 's'
+    _about = 'Create Entry Simple <name>; <comment>'
+    parent = create_entry
 
     def about(self, name="", comment=""):
         return self._about.replace(
@@ -51,7 +60,8 @@ class CreateItem(BaseCommand):
         )
 
     def __call__(self, stdscr, menu: "Menu", console: "Console", args):
-        item = SimpleItem(args[0], args[1])
-        menu.add_item(item)
+        entry = SimpleEntry(args[0], args[1], [])
+        menu.manager.add_item_to_cur_tag(entry)
+        menu.update_items()
 
-CreateItem()
+CreateEntrySimple()

@@ -78,7 +78,7 @@ class Menu:
             self.pos -= 1
         elif KEY_ESC == key:
             return NEED_EXIT
-        elif KEY_ENTER == key or curses.KEY_RIGHT == key:
+        elif curses.KEY_RIGHT == key:
             self.items[self.pos].press()
             self.update_items()
         elif curses.KEY_LEFT == key:
