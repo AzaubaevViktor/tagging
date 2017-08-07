@@ -31,9 +31,7 @@ class Console:
             else:
                 self.line += key
                 self.is_handle_key = True
-
         else:
-
             if curses.KEY_BACKSPACE == key:
                 self.line = self.line[:-1]
                 self.is_handle_key = True

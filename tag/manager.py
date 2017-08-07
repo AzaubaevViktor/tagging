@@ -20,6 +20,7 @@ class TagManager:
             SimpleEntry("Fourth Text", "Comment1 bI, t11", [t11]),
             SimpleEntry("Fifth Text", "Comment1 bI, t1, t2", [t1, t2]),
             SimpleEntry("Sixth Text", "Comment1 bI, t2, t11", [t2, t11]),
+            LinkEntry("http://google.ru", "comment", [t1])
         ]
 
         self.active_tag = self.root_tag
@@ -101,10 +102,10 @@ class SimpleEntry:
 
 
 class LinkEntry(SimpleEntry):
-    def __init__(self, link: str, comment: str):
+    def __init__(self, link: str, comment: str, tags: List[Tag] = None):
         self.link = link
         name = link
-        super().__init__(name, comment)
+        super().__init__(name, comment, tags)
 
     @property
     def item(self):
