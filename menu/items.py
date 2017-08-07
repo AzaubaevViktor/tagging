@@ -1,6 +1,10 @@
 import abc
 import webbrowser
 
+import subprocess
+
+from pathlib import Path
+
 
 class AbstractItemType(metaclass=abc.ABCMeta):
     def press(self):
@@ -29,3 +33,18 @@ class LinkItem(AbstractItemType):
 
     def press(self):
         webbrowser.open(self.link)
+
+
+class FileItem(AbstractItemType):
+    def __init__(
+            self,
+            name: str,
+            comment: str,
+            address: str
+    ):
+        self.name = name
+        self.comment = comment
+        self.address = address.replace("~", str(Path.home()))
+
+    def press(self):
+        subprocess.run(['xdg-open', self.address])

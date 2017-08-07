@@ -8,7 +8,7 @@ from curses import wrapper
 import curses_wrapper as cw
 
 from console import Console
-from menu import SimpleItem, Menu, NEED_KEY, LinkItem
+from menu import SimpleItem, Menu, NEED_KEY, LinkItem, FileItem
 
 
 def main(stdscr):
@@ -16,11 +16,12 @@ def main(stdscr):
     item2 = SimpleItem("Это второй", "Comment1")
     item3 = SimpleItem("Ну а это третий", "Comment1")
     link = LinkItem("Ссылка", "Описание страницы", "http://google.ru")
+    file = FileItem("Файл", "Описание файла", "~")
 
     cw.init(stdscr)
 
     menu = Menu(stdscr)
-    menu.items = [item1, item2, item3, link]
+    menu.items = [item1, item2, item3, link, file]
 
     console = Console(stdscr)
     console.menu = menu
