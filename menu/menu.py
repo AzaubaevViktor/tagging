@@ -6,6 +6,7 @@ from curses_wrapper import colors
 from .statuses import NEED_KEY, NEED_EXIT
 
 KEY_ESC = 27
+KEY_ENTER = 10
 
 
 class Menu:
@@ -65,6 +66,8 @@ class Menu:
             self.active_item -= 1
         elif KEY_ESC == key:
             return NEED_EXIT
+        elif KEY_ENTER == key:
+            self.items[self.active_item].press()
 
         return NEED_KEY
 

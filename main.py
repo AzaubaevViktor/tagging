@@ -8,18 +8,19 @@ from curses import wrapper
 import curses_wrapper as cw
 
 from console import Console
-from menu import SimpleItem, Menu, NEED_KEY
+from menu import SimpleItem, Menu, NEED_KEY, LinkItem
 
 
 def main(stdscr):
     item1 = SimpleItem("Это первый тестовый вариант", "Comment1")
     item2 = SimpleItem("Это второй", "Comment1")
     item3 = SimpleItem("Ну а это третий", "Comment1")
+    link = LinkItem("Ссылка", "Описание страницы", "http://google.ru")
 
     cw.init(stdscr)
 
     menu = Menu(stdscr)
-    menu.items = [item1, item2, item3]
+    menu.items = [item1, item2, item3, link]
 
     console = Console(stdscr)
     console.menu = menu
