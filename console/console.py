@@ -3,34 +3,15 @@ import curses
 
 from curses_wrapper import colors
 
-
-class BaseCommand:
-    def __init__(self, char, about, parent: "Command"):
-        self.char = char
-        self.about = about
-        self.parent = parent
-        self.childrens = {}
-        if parent is not None:
-            self.parent.childrens[self.char] = self
-
-    def run(self, stdscr, menu: "Menu", console: "Console"):
-        pass
-
-base_cmd = BaseCommand('', 'Enter `h` for Help', None)
-
-
-class HelpCommand(BaseCommand):
-    pass
-
-HelpCommand('h', 'This is help!', base_cmd)
+from .commands import base_cmd
 
 
 class Console:
     def __init__(self, stdscr):
         self.stdscr = stdscr
         self.height, self.width = stdscr.getmaxyx()
-        self.win = curses.newwin(2, self.width, self.height - 5, 0)
-        self.line = "хуй"
+        self.win = curses.newwin(3, self.width, self.height - 3, 0)
+        self.line = ""
         self.a = 0
 
     def key_handle(self, key):
@@ -45,10 +26,20 @@ class Console:
             if curses.KEY_BACKSPACE == key:
                 self.line = self.line[:-1]
 
+    @property
+    def args(self):
+        pos = self.line.find(" ")
+        if -1 == pos:
+            return tuple()
+
+        args = self.line[pos:]
+        return (x.strip() for x in args.split(";"))
+
     def get_help(self):
         cmd = base_cmd
-        hlp = base_cmd.about
         for ch in self.line:
+            if ' ' == ch:
+                break
             child = cmd.childrens.get(ch, None)
             cmd = child
             if not cmd:
@@ -57,7 +48,7 @@ class Console:
         if not cmd:
             hlp = "Unknown command. Enter `h` for help"
         else:
-            hlp = cmd.about
+            hlp = cmd.about(*self.args)
 
         return hlp
 
@@ -68,7 +59,7 @@ class Console:
         self.win.clear()
         self.win.addstr(0, 0, "=" * self.width)
         self.win.addstr(1, 0, "> " + self.line, colors.TEXT)
-        self.win.addstr(1, len(line) + 1, self.get_help(), colors.COMMENT)
+        self.win.addstr(2, 0, self.get_help(), colors.COMMENT)
 
     def run(self):
         pass
