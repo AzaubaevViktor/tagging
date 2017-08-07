@@ -22,11 +22,11 @@ def init(stdscr):
 
 
 def _init_colors():
-    curses.init_pair(1, -1, 0)  # White on Black
+    curses.init_pair(1, -1, -1)  # White on Black
     colors.TEXT = curses.color_pair(1)
 
-    curses.init_pair(2, 0, 7)  # Black on White
+    curses.init_pair(2, -1, 8)  # Black on Gray
     colors.ACTIVE_TEXT = curses.color_pair(2)
 
-    curses.init_pair(3, 8, 0)  # Gray on Black
+    curses.init_pair(3, 8, -1)  # Gray on Black
     colors.COMMENT = curses.color_pair(3)
