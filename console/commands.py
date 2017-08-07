@@ -1,6 +1,6 @@
 import itertools as it
 from tag import SimpleEntry, LinkEntry
-from tag.manager import FileEntry
+from tag.manager import FileEntry, Tag
 
 
 class BaseCommand:
@@ -77,6 +77,19 @@ class Create(BaseCommand):
 create = Create()
 
 
+class CreateTag(Create):
+    name = "Tag"
+    parent = create
+
+    _args = ("name", )
+
+    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+        tag = Tag(args[0])
+        menu.add_item(tag)
+
+CreateTag()
+
+
 class CreateEntry(BaseCommand):
     name = 'Entry'
     parent = create
@@ -93,8 +106,7 @@ class CreateEntry(BaseCommand):
             args = args[0], "Edit this comment"
 
         entry = self.entry_class(args[0], args[1])
-        menu.manager.add_item_to_cur_tag(entry)
-        menu.update_items()
+        menu.add_item(entry)
 
 create_entry = CreateEntry()
 

@@ -44,8 +44,11 @@ class TagManager:
         tag = self.active_tag
         return tag.separator.join([str(node.name) for node in tag.path]) or tag.separator
 
-    def add_item_to_cur_tag(self, item: "AbstractItem"):
-        item.add_tag(self.active_tag)
+    def add_item_to_cur_tag(self, item):
+        if isinstance(item, SimpleEntry):
+            item.add_tag(self.active_tag)
+        if isinstance(item, Tag):
+            item.parent = self.active_tag
 
 
 class Tag(anytree.NodeMixin):

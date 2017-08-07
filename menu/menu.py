@@ -36,8 +36,9 @@ class Menu:
     def items(self):
         return self._items
 
-    def add_item(self, item: "SimpleItem"):
-        self._items.append(item)
+    def add_item(self, item):
+        self.manager.add_item_to_cur_tag(item)
+        self.update_items()
 
     @items.setter
     def items(self, items):
