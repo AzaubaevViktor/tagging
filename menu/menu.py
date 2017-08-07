@@ -55,7 +55,7 @@ class Menu:
             self._pos = value % length
 
     def render(self):
-        self.stdscr.addstr(0, 0, "> Матан > Дифференциальные уровнения")
+        self.stdscr.addstr(0, 0, self.manager.path)
         self.stdscr.addstr(1, 0, "=" * self.width)
         self.stdscr.addstr(0, self.width - len(HELLO_HEADER) - 1, HELLO_HEADER)
 

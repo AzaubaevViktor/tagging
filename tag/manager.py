@@ -38,6 +38,11 @@ class TagManager:
 
         return items
 
+    @property
+    def path(self):
+        tag = self.active_tag
+        return tag.separator.join([str(node.name) for node in tag.path]) or tag.separator
+
 
 class Tag(anytree.NodeMixin):
     separator = " > "
