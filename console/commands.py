@@ -1,4 +1,4 @@
-from menu import SimpleItem
+import itertools as it
 from tag import SimpleEntry, LinkEntry
 
 
@@ -6,6 +6,7 @@ class BaseCommand:
     char = ""
     _about = ': [Help Create]'
     parent = None  # type: "Command"
+    _args = ()
 
     def __init__(self):
         self.childrens = {}
@@ -16,7 +17,20 @@ class BaseCommand:
         pass
 
     def about(self, *args):
-        return self._about
+        _args = {key: value or "" for key, value in it.zip_longest(self._args, args)}
+
+        about = self._about
+
+        _arg_s = []
+
+        for key in self._args:
+            value = _args[key]
+            _arg_s.append("<{}{}>".format(
+                key,
+                ":" + value if value else value
+            ))
+
+        return about + " " + "; ".join(_arg_s)
 
 base_cmd = BaseCommand()
 
@@ -47,17 +61,9 @@ create_entry = CreateEntry()
 
 class CreateEntrySimple(BaseCommand):
     char = 's'
-    _about = 'Create Entry Simple <name>; <comment>'
+    _about = 'Create Entry Simple'
     parent = create_entry
-
-    def about(self, name="", comment=""):
-        return self._about.replace(
-            "<name>",
-            "<name:{}>".format(name)
-        ).replace(
-            "<comment>",
-            "<comment:{}>".format(comment)
-        )
+    _args = ("name", "comment")
 
     def __call__(self, stdscr, menu: "Menu", console: "Console", args):
         entry = SimpleEntry(args[0], args[1])
@@ -69,17 +75,10 @@ CreateEntrySimple()
 
 class CreateEntryLink(BaseCommand):
     char = 'l'
-    _about = 'Create Entry Link <link>; <comment>'
+    _about = 'Create Entry Link'
     parent = create_entry
 
-    def about(self, link="", comment=""):
-        return self._about.replace(
-            "<link>",
-            "<link:{}>".format(link)
-        ).replace(
-            "<comment>",
-            "<comment:{}>".format(comment)
-        )
+    _args = ("link", "comment")
 
     def __call__(self, stdscr, menu: "Menu", console: "Console", args):
         entry = LinkEntry(args[0], args[1])
