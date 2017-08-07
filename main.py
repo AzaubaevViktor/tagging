@@ -2,6 +2,8 @@
 
 import locale
 
+import os
+
 from tag import TagManager
 
 locale.setlocale(locale.LC_ALL, '')
@@ -13,6 +15,8 @@ import curses_wrapper as cw
 from console import Console
 from menu import SimpleItem, Menu, NEED_KEY, LinkItem, FileItem
 
+
+os.environ.setdefault('ESCDELAY', '25')
 
 def main(stdscr):
     cw.init(stdscr)
