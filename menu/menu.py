@@ -19,7 +19,7 @@ class Menu:
 
         self.update_items()
 
-        self._active_item = 0
+        self._pos = 0
 
     @property
     def width(self):
@@ -42,17 +42,17 @@ class Menu:
     @items.setter
     def items(self, items):
         self._items = items
-        self.active_item = 0
+        self.pos = 0
 
     @property
-    def active_item(self):
-        return self._active_item
+    def pos(self):
+        return self._pos
 
-    @active_item.setter
-    def active_item(self, value: int):
+    @pos.setter
+    def pos(self, value: int):
         length = len(self.items)
         if 0 != length:
-            self._active_item = value % length
+            self._pos = value % length
 
     def render(self):
         self.stdscr.addstr(0, 0, "> Матан > Дифференциальные уровнения")
@@ -60,7 +60,10 @@ class Menu:
         self.stdscr.addstr(0, self.width - len(HELLO_HEADER) - 1, HELLO_HEADER)
 
         for i, item in enumerate(self.items):
-            color = colors.ACTIVE_TEXT if i == self.active_item else colors.TEXT
+            color = colors.ACTIVE_TEXT if i == self.pos else colors.TEXT
+
+            if isinstance(self.items[i], TagItem):
+                color |= curses.A_BOLD
 
             y = (i + 1) * 2
             self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
@@ -70,13 +73,13 @@ class Menu:
         key = ord(key) if isinstance(key, str) else key
 
         if curses.KEY_DOWN == key:
-            self.active_item += 1
+            self.pos += 1
         elif curses.KEY_UP == key:
-            self.active_item -= 1
+            self.pos -= 1
         elif KEY_ESC == key:
             return NEED_EXIT
         elif KEY_ENTER == key or curses.KEY_RIGHT == key:
-            self.items[self.active_item].press()
+            self.items[self.pos].press()
             self.update_items()
         elif curses.KEY_LEFT == key:
             self.manager.up()
