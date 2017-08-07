@@ -1,28 +1,11 @@
 import curses
-import abc
 from typing import List
 
 from settings import HELLO_HEADER
 from curses_wrapper import colors
+from .statuses import NEED_KEY, NEED_EXIT
 
 KEY_ESC = 27
-
-NEED_EXIT = 1
-NEED_KEY = 2
-
-
-class AbstractItemType(metaclass=abc.ABCMeta):
-    def press(self):
-        pass
-
-
-class SimpleItem:
-    def __init__(self,
-                 name: str,
-                 comment: str
-                 ):
-        self.name = name
-        self.comment = comment
 
 
 class Menu:
@@ -43,6 +26,9 @@ class Menu:
     @property
     def items(self):
         return self._items
+
+    def add_item(self, item: "SimpleItem"):
+        self._items.append(item)
 
     @items.setter
     def items(self, items):

@@ -1,3 +1,5 @@
+from menu import SimpleItem
+
 
 class BaseCommand:
     char = ""
@@ -9,7 +11,7 @@ class BaseCommand:
         if self.parent is not None:
             self.parent.childrens[self.char] = self
 
-    def run(self, stdscr, menu: "Menu", console: "Console"):
+    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
         pass
 
     def about(self, *args):
@@ -47,5 +49,9 @@ class CreateItem(BaseCommand):
             "<comment>",
             "<comment:{}>".format(comment)
         )
+
+    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+        item = SimpleItem(args[0], args[1])
+        menu.add_item(item)
 
 CreateItem()

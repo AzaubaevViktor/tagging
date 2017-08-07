@@ -1,4 +1,3 @@
-import abc
 import curses
 
 from curses_wrapper import colors
@@ -13,6 +12,7 @@ class Console:
         self.win = curses.newwin(3, self.width, self.height - 3, 0)
         self.line = ""
         self.a = 0
+        self.menu = None  # type: "Menu"
 
     def key_handle(self, key):
 
@@ -33,17 +33,22 @@ class Console:
             return tuple()
 
         args = self.line[pos:]
-        return (x.strip() for x in args.split(";"))
+        return [x.strip() for x in args.split(";")]
 
-    def get_help(self):
+    @property
+    def cmd(self):
         cmd = base_cmd
         for ch in self.line:
             if ' ' == ch:
                 break
-            child = cmd.childrens.get(ch, None)
-            cmd = child
+            cmd = cmd.childrens.get(ch, None)
             if not cmd:
                 break
+
+        return cmd
+
+    def get_help(self):
+        cmd = self.cmd
 
         if not cmd:
             hlp = "Unknown command. Enter `h` for help"
@@ -58,11 +63,17 @@ class Console:
 
         self.win.clear()
         self.win.addstr(0, 0, "=" * self.width)
-        self.win.addstr(1, 0, "> " + self.line, colors.TEXT)
+        self.win.addstr(1, 0, line, colors.TEXT)
         self.win.addstr(2, 0, self.get_help(), colors.COMMENT)
 
     def run(self):
-        pass
+        cmd = self.cmd
+
+        if not cmd:
+            return False
+        else:
+            cmd(self.stdscr, self.menu, self, self.args)
+            return True
 
     def refresh(self):
         self.win.refresh()

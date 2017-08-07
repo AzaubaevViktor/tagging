@@ -22,6 +22,7 @@ def main(stdscr):
     menu.items = [item1, item2, item3]
 
     console = Console(stdscr)
+    console.menu = menu
 
     status = NEED_KEY
     while NEED_KEY == status:
