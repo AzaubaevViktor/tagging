@@ -2,6 +2,7 @@ import curses
 import abc
 from typing import List
 
+from settings import HELLO_HEADER
 
 KEY_ESC = 27
 
@@ -23,7 +24,6 @@ class Item:
         self.comment = comment
 
 
-
 class Menu:
     def __init__(self, stdscr):
         self._init_curses(stdscr)
@@ -33,13 +33,33 @@ class Menu:
 
     def _init_curses(self, stdscr):
         self.stdscr = stdscr
+        curses.start_color()
+        curses.use_default_colors()
+
+        self._init_colors()
+
         self.stdscr.clear()
         curses.noecho()
         curses.cbreak()
         self.stdscr.keypad(True)
 
-        # init colors
-        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+    def _init_colors(self):
+        curses.init_pair(1, -1, 0)  # White on Black
+        self.TEXT = curses.color_pair(1)
+
+        curses.init_pair(2, 0, 7)  # Black on White
+        self.ACTIVE_TEXT = curses.color_pair(2)
+
+        curses.init_pair(3, 8, 0)  # Gray on Black
+        self.COMMENT = curses.color_pair(3)
+
+    @property
+    def width(self):
+        return self.stdscr.getmaxyx()[1]
+
+    @property
+    def height(self):
+        return self.stdscr.getmaxyx()[0]
 
     @property
     def items(self):
@@ -61,16 +81,22 @@ class Menu:
             self._active_item = value % length
 
     def render(self):
+        self.stdscr.addstr(0, 0, "> Матан > Дифференциальные уровнения")
+        self.stdscr.addstr(1, 0, "=" * self.width)
+        self.stdscr.addstr(0, self.width - len(HELLO_HEADER) - 1, HELLO_HEADER)
+
         for i, item in enumerate(self.items):
-            color = curses.A_REVERSE if i == self.active_item else curses.COLOR_WHITE
-            self.stdscr.addstr(i * 3, 0, item.name, color)
+            color = self.ACTIVE_TEXT if i == self.active_item else self.TEXT
+            y = (i + 1) * 3
+            self.stdscr.addstr(y, 0, item.name, color)
+            self.stdscr.addstr(y + 1, 2, item.comment[:30], self.COMMENT)
 
     def key_handle(self, key):
         if curses.KEY_DOWN == key:
             self.active_item += 1
         elif curses.KEY_UP == key:
             self.active_item -= 1
-        elif KEY_ESC == key:
+        elif KEY_ESC == key or ord('q') == key:
             return NEED_EXIT
 
         return NEED_KEY
