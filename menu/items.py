@@ -13,9 +13,11 @@ class AbstractItemType(metaclass=abc.ABCMeta):
 
 class SimpleItem(AbstractItemType):
     def __init__(self,
+                 source,
                  name: str,
                  comment: str
                  ):
+        self.source = source
         self.name = name
         self.comment = comment
 
@@ -26,10 +28,12 @@ class SimpleItem(AbstractItemType):
 class LinkItem(AbstractItemType):
     def __init__(
             self,
+            source,
             name: str,
             comment: str,
             link: str
     ):
+        self.source = source
         self.name = name
         self.comment = comment
         self.link = link
@@ -41,10 +45,12 @@ class LinkItem(AbstractItemType):
 class FileItem(AbstractItemType):
     def __init__(
             self,
+            source,
             name: str,
             comment: str,
             path: str
     ):
+        self.source = source
         self.name = name
         self.comment = comment
         self.path = path.replace("~", str(Path.home()))
@@ -56,13 +62,13 @@ class FileItem(AbstractItemType):
 class TagItem(AbstractItemType):
     def __init__(
             self,
-            tag: "Tag",
+            source: "Tag",
             tag_manager: "TagManager"
     ):
-        self.tag = tag
-        self.name = tag.name
+        self.source = source
+        self.name = source.name
         self.comment = "Tag"
         self.manager = tag_manager
 
     def press(self):
-        self.manager.active_tag = self.tag
+        self.manager.active_tag = self.source

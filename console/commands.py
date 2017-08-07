@@ -70,6 +70,25 @@ class HelpCommand(BaseCommand):
 HelpCommand()
 
 
+class Item(BaseCommand):
+    name = "Item"
+    parent = base_cmd
+
+item = Item()
+
+
+class DeleteItem(Item):
+    name = "Delete"
+    parent = item
+    _args = ('yes', )
+
+    def __call__(self, stdscr, menu: "Menu", console: "Console", args):
+        if "y" in args[0].lower():
+            menu.delete_item()
+
+DeleteItem()
+
+
 class Create(BaseCommand):
     name = 'Create'
     parent = base_cmd

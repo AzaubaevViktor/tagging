@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 import anytree
 
 from menu import SimpleItem, TagItem, LinkItem, AbstractItemType, FileItem
@@ -50,6 +50,14 @@ class TagManager:
         if isinstance(item, Tag):
             item.parent = self.active_tag
 
+    def delete_item(self, item):
+        if isinstance(item, Tag):
+            item.parent = None
+            for child in item.children:
+                self.delete_item(child)
+            for entry in item.entries:
+                entry.remove_tag(item)
+
 
 class Tag(anytree.NodeMixin):
     separator = " > "
@@ -57,7 +65,7 @@ class Tag(anytree.NodeMixin):
     def __init__(self, name, parent=None):
         super().__init__()
         self.name = name
-        self._entries = set()
+        self._entries = set() # type: Set[SimpleEntry]
         self.parent = parent
         self._manager = None
 
@@ -66,7 +74,7 @@ class Tag(anytree.NodeMixin):
         return self.root._manager
 
     @property
-    def entries(self):
+    def entries(self) -> Set['SimpleEntry']:
         return self._entries
 
     def add_entry(self, entry: "SimpleEntry"):
@@ -99,9 +107,12 @@ class SimpleEntry:
         for tag in tags:
             self.add_tag(tag)
 
+    def remove_tag(self, tag: Tag):
+        self._tags.remove(tag)
+
     @property
     def item(self) -> AbstractItemType:
-        return SimpleItem(self.name, self.comment)
+        return SimpleItem(self, self.name, self.comment)
 
 
 class LinkEntry(SimpleEntry):
@@ -115,7 +126,7 @@ class LinkEntry(SimpleEntry):
 
     @property
     def item(self) -> AbstractItemType:
-        return LinkItem(self.name, self.comment, self.link)
+        return LinkItem(self, self.name, self.comment, self.link)
 
 
 class FileEntry(SimpleEntry):
@@ -125,5 +136,5 @@ class FileEntry(SimpleEntry):
 
     @property
     def item(self) -> AbstractItemType:
-        return FileItem(self.name, self.comment, self.path)
+        return FileItem(self, self.name, self.comment, self.path)
 

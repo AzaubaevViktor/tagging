@@ -55,6 +55,14 @@ class Menu:
         if 0 != length:
             self._pos = value % length
 
+    @property
+    def active_item(self) -> "AbstractItem":
+        return self.items[self.pos]
+
+    def delete_item(self):
+        self.manager.delete_item(self.active_item.source)
+        self.update_items()
+
     def render(self):
         self.stdscr.addstr(0, 0, self.manager.path)
         self.stdscr.addstr(1, 0, "=" * self.width)
