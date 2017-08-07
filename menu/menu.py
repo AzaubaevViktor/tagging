@@ -67,7 +67,7 @@ class Menu:
 
             y = (i + 1) * 2
             self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
-            self.stdscr.addstr(y + 1, 2, "{}".format(item) + " " + item.comment[:30], colors.COMMENT)
+            self.stdscr.addstr(y + 1, 2, item.comment[:30], colors.COMMENT)
 
     def key_handle(self, key):
         key = ord(key) if isinstance(key, str) else key
