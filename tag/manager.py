@@ -24,6 +24,9 @@ class TagManager:
 
         self.active_tag = self.root_tag
 
+    def up(self):
+        self.active_tag = self.active_tag.parent or self.root_tag
+
     @property
     def items(self):
         items = []

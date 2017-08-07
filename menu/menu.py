@@ -3,6 +3,7 @@ from typing import List
 
 from settings import HELLO_HEADER
 from curses_wrapper import colors
+from .items import TagItem
 from .statuses import NEED_KEY, NEED_EXIT
 
 KEY_ESC = 27
@@ -60,6 +61,7 @@ class Menu:
 
         for i, item in enumerate(self.items):
             color = colors.ACTIVE_TEXT if i == self.active_item else colors.TEXT
+
             y = (i + 1) * 2
             self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
             self.stdscr.addstr(y + 1, 2, "{}".format(item) + " " + item.comment[:30], colors.COMMENT)
@@ -73,8 +75,11 @@ class Menu:
             self.active_item -= 1
         elif KEY_ESC == key:
             return NEED_EXIT
-        elif KEY_ENTER == key:
+        elif KEY_ENTER == key or curses.KEY_RIGHT == key:
             self.items[self.active_item].press()
+            self.update_items()
+        elif curses.KEY_LEFT == key:
+            self.manager.up()
             self.update_items()
 
         return NEED_KEY
