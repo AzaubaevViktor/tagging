@@ -1,2 +1,3 @@
 from .manager import TagManager
-from .manager import SimpleEntry, LinkEntry, FileEntry
+from .entries import SimpleEntry, LinkEntry, FileEntry
+from .tag import Tag

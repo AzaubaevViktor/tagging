@@ -5,7 +5,7 @@ from curses.textpad import rectangle, Textbox
 
 from .my_textpad import MyTextPad
 from tag import SimpleEntry, LinkEntry
-from tag.manager import FileEntry, Tag
+from tag import FileEntry, Tag
 
 
 class BaseCommand:

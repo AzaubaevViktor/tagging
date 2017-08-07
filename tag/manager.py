@@ -1,8 +1,5 @@
-from typing import List, Set
-import anytree
-import lxml.html
-
-from menu import SimpleItem, TagItem, LinkItem, AbstractItemType, FileItem
+from .entries import SimpleEntry, LinkEntry
+from .tag import Tag
 
 
 class TagManager:
@@ -48,7 +45,7 @@ class TagManager:
     def add_item_to_cur_tag(self, item):
         if isinstance(item, SimpleEntry):
             item.add_tag(self.active_tag)
-        if isinstance(item, Tag):
+        if isinstance(item,g):
             item.parent = self.active_tag
 
     def delete_item(self, item):
@@ -60,105 +57,5 @@ class TagManager:
                 entry.remove_tag(item)
 
 
-class Tag(anytree.NodeMixin):
-    separator = " > "
-    fields = ('name', )
 
-    def __init__(self, name, parent=None):
-        super().__init__()
-        self.name = name
-        self._entries = set() # type: Set[SimpleEntry]
-        self.parent = parent
-        self._manager = None
-
-    @property
-    def manager(self):
-        return self.root._manager
-
-    @property
-    def entries(self) -> Set['SimpleEntry']:
-        return self._entries
-
-    def add_entry(self, entry: "SimpleEntry"):
-        if entry not in self._entries:
-            self._entries.add(entry)
-            entry.add_tag(self)
-
-    @property
-    def item(self):
-        return TagItem(self, self.manager)
-
-
-class SimpleEntry:
-    fields = ('name', 'comment')
-
-    def __init__(self, name: str, comment: str, tags: List[Tag] = None):
-        self.name = name
-        self.comment = comment
-        self._tags = set()
-        self.add_tags(tags or [])
-
-    @property
-    def tags(self):
-        return self._tags
-
-    def add_tag(self, tag: Tag):
-        if tag not in self._tags:
-            self._tags.add(tag)
-            tag.add_entry(self)
-
-    def add_tags(self, tags: List[Tag]):
-        for tag in tags:
-            self.add_tag(tag)
-
-    def remove_tag(self, tag: Tag):
-        self._tags.remove(tag)
-
-    @property
-    def item(self) -> AbstractItemType:
-        return SimpleItem(self, self.name, self.comment)
-
-
-class LinkEntry(SimpleEntry):
-    fields = ('link', 'comment')
-
-    def __init__(self, link: str, comment: str, tags: List[Tag] = None):
-        self._link = ""
-        self.link = link
-
-        super().__init__(self.name, comment, tags)
-
-    @property
-    def link(self):
-        return self._link
-
-    @link.setter
-    def link(self, val):
-        val = str(val)
-        if "http://" not in val:
-            val = "http://" + val
-
-        try:
-            t = lxml.html.parse(val)
-            self.name = t.find(".//title").text
-        except Exception:
-            self.name = val
-
-        self._link = val
-
-    @property
-    def item(self) -> AbstractItemType:
-        return LinkItem(self, self.name, self.comment, self.link)
-
-
-class FileEntry(SimpleEntry):
-    fields = ('path', 'comment')
-
-    def __init__(self, path: str, comment: str, tags: List[Tag] = None):
-        self.path = path
-        super().__init__(path.split("/")[-1], comment, tags)
-
-    @property
-    def item(self) -> AbstractItemType:
-        return FileItem(self, self.name, self.comment, self.path)
 
