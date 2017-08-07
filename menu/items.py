@@ -19,6 +19,9 @@ class SimpleItem(AbstractItemType):
         self.name = name
         self.comment = comment
 
+    def press(self):
+        pass
+
 
 class LinkItem(AbstractItemType):
     def __init__(
@@ -40,14 +43,14 @@ class FileItem(AbstractItemType):
             self,
             name: str,
             comment: str,
-            address: str
+            path: str
     ):
         self.name = name
         self.comment = comment
-        self.address = address.replace("~", str(Path.home()))
+        self.path = path.replace("~", str(Path.home()))
 
     def press(self):
-        subprocess.run(['xdg-open', self.address])
+        subprocess.run(['xdg-open', self.path])
 
 
 class TagItem(AbstractItemType):

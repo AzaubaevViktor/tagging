@@ -1,7 +1,7 @@
 from typing import List
 import anytree
 
-from menu import SimpleItem, TagItem, LinkItem
+from menu import SimpleItem, TagItem, LinkItem, AbstractItemType, FileItem
 
 
 class TagManager:
@@ -97,18 +97,30 @@ class SimpleEntry:
             self.add_tag(tag)
 
     @property
-    def item(self):
+    def item(self) -> AbstractItemType:
         return SimpleItem(self.name, self.comment)
 
 
 class LinkEntry(SimpleEntry):
     def __init__(self, link: str, comment: str, tags: List[Tag] = None):
         self.link = link
-        name = link
+        if "http://" not in self.link:
+            self.link = "http://" + self.link
+
+        name = self.link
         super().__init__(name, comment, tags)
 
     @property
-    def item(self):
+    def item(self) -> AbstractItemType:
         return LinkItem(self.name, self.comment, self.link)
 
+
+class FileEntry(SimpleEntry):
+    def __init__(self, path: str, comment: str, tags: List[Tag] = None):
+        self.path = path
+        super().__init__(path.split("/")[-1], comment, tags)
+
+    @property
+    def item(self) -> AbstractItemType:
+        return FileItem(self.name, self.comment, self.path)
 
