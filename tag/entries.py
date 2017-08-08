@@ -29,7 +29,9 @@ class SimpleEntry:
             self.add_tag(tag)
 
     def remove_tag(self, tag: Tag):
-        self._tags.remove(tag)
+        if tag in self.tags:
+            self._tags.remove(tag)
+            tag.remove_entry(self)
 
     @property
     def item(self) -> AbstractItemType:

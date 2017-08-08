@@ -215,6 +215,51 @@ class ItemTagAdd(ItemTag):
 ItemTagAdd()
 
 
+class ItemTagDelete(ItemTag):
+    name = "Delete"
+    parent = item_tag
+    _args = ("tag", )
+
+    def tag_predict(self, tag_name, **kwargs):
+        entry = kwargs['entry']
+        if not entry:
+            return
+
+        for tag in entry.tags:
+            if tag.name.startswith(tag_name):
+                return tag
+
+        return None
+
+    def arguments(self, *args, **kwargs):
+        argkv = super().arguments(*args, **kwargs)
+        entry = kwargs['entry']
+
+        if entry:
+            tag = self.tag_predict(argkv['tag'], **kwargs)
+
+            if tag:
+                argkv['tag'] = tag.name
+
+        return argkv
+
+    def __call__(self, *args, **kwargs):
+        entry = kwargs['entry']
+        if not entry:
+            return
+
+        argkv = self.arguments(*args, **kwargs)
+        tag_name = argkv['tag']
+
+        manager = kwargs['manager']
+        menu = kwargs['menu']
+
+        entry.remove_tag(manager.get_tag(tag_name))
+        menu.update_items()
+
+ItemTagDelete()
+
+
 class ItemDelete(Item):
     name = "Delete"
     parent = item

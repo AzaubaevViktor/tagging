@@ -30,7 +30,9 @@ class Tag(anytree.NodeMixin):
             entry.add_tag(self)
 
     def remove_entry(self, entry: "SimpleEntry"):
-        self._entries.remove(entry)
+        if entry in self.entries:
+            self._entries.remove(entry)
+            entry.remove_tag(self)
 
     @property
     def item(self):
