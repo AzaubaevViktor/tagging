@@ -52,7 +52,7 @@ class AbstractEntry(metaclass=abc.ABCMeta):
     def __from_json__(cls, manager, data):
         cls = _classes[data['class']]
 
-        kwargs = {k: data[k] for k in cls.fields}
+        kwargs = {k: data.get(k, "") for k in cls.fields}
         kwargs['tags'] = [manager.get_by_id(_id) for _id in data['tags']]
         entry = cls(**kwargs)
         entry.id = data['id']
@@ -80,10 +80,11 @@ SimpleEntry.register()
 
 
 class LinkEntry(SimpleEntry):
-    fields = ('link', 'comment')
+    fields = ('name', 'link', 'comment')
 
-    def __init__(self, link: str, comment: str, tags: List[Tag] = None):
+    def __init__(self, link: str, comment: str, tags: List[Tag] = None, name=""):
         self._link = ""
+        self.name = name
         self.link = link
 
         super().__init__(self.name, comment, tags)
@@ -98,11 +99,12 @@ class LinkEntry(SimpleEntry):
         if "http://" not in val:
             val = "http://" + val
 
-        try:
-            t = lxml.html.parse(val)
-            self.name = t.find(".//title").text
-        except Exception:
-            self.name = val
+        if not self.name:
+            try:
+                t = lxml.html.parse(val)
+                self.name = t.find(".//title").text.strip()
+            except Exception:
+                self.name = val
 
         self._link = val
 
