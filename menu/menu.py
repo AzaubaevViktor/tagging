@@ -98,8 +98,18 @@ class Menu:
                 color |= curses.A_BOLD
 
             y = ((i - start_item) + 1) * 2
-            self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
-            self.stdscr.addstr(y + 1, 2, item.comment, colors.COMMENT)
+
+            header = item.header
+            header_low = item.header_low
+            about = item.about
+
+            self.stdscr.addstr(y, 0, "{:}: {}".format(i, header), color)
+            self.stdscr.addstr(y, len(header) + 1 + len(str(i)) + 2,
+                               header_low[:self.width - len(header) - len(str(i)) - 3],
+                               colors.COMMENT
+                               )
+
+            self.stdscr.addstr(y + 1, 2, item.about, colors.COMMENT)
 
     def key_handle(self, key):
         key = ord(key) if isinstance(key, str) else key
