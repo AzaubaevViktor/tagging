@@ -1,5 +1,9 @@
+import json
+import shutil
+
 from anytree import LevelOrderIter
 
+from settings import FILE_DB
 from .entries import SimpleEntry, LinkEntry
 from .tag import Tag
 
@@ -46,8 +50,6 @@ class TagManager:
 
         return None
 
-
-
     @property
     def path(self):
         tag = self.active_tag
@@ -69,3 +71,17 @@ class TagManager:
         elif isinstance(item, SimpleEntry):
             for tag in item.tags:
                 tag.remove_entry(item)
+
+    def __json__(self):
+        return {
+            "tags": [tag.__json__() for tag in LevelOrderIter(self.root_tag)],
+            "entries": [entry.__json__() for entry in self.entries]
+        }
+
+    def save(self):
+        try:
+            shutil.copyfile(FILE_DB, ".{}.backup".format(FILE_DB))
+        except FileNotFoundError:
+            pass
+        json.dump(self.__json__(), open(FILE_DB, "wt"), indent=4)
+

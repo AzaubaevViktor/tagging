@@ -31,6 +31,7 @@ class Menu:
 
     def update_items(self):
         self.items = self.manager.items
+        self.manager.save()
 
     @property
     def items(self):

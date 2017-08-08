@@ -38,6 +38,13 @@ class Tag(anytree.NodeMixin):
     def item(self):
         return TagItem(self, self.manager)
 
+    def __json__(self):
+        return {
+            "id": id(self),
+            "name": self.name,
+            "parent": id(self.parent) if self.parent is not None else -1
+        }
+
     def __str__(self):
         return self.name
 

@@ -37,6 +37,17 @@ class SimpleEntry:
     def item(self) -> AbstractItemType:
         return SimpleItem(self, self.name, self.comment)
 
+    def __json__(self):
+        data = {
+            "id": id(self),
+            "tags": [id(tag) for tag in self.tags]
+        }
+
+        for field in self.fields:
+            data[field] = getattr(self, field)
+
+        return data
+
 
 class LinkEntry(SimpleEntry):
     fields = ('link', 'comment')
