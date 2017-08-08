@@ -1,5 +1,7 @@
 import json
 import shutil
+from random import randint
+from typing import List
 
 from anytree import LevelOrderIter
 
@@ -10,27 +12,43 @@ from .tag import Tag
 
 class TagManager:
     def __init__(self):
-        self.root_tag = Tag("")
+        self.root_tag = Tag("", _id=Tag.ROOT_ID)
         self.root_tag._manager = self
 
-        t1 = Tag("FirstTag", parent=self.root_tag)
-        t2 = Tag("SecondTag", parent=self.root_tag)
-        t11 = Tag("InsideTag", parent=t1)
-
-        self.entries = [
-            SimpleEntry("First Text", "Comment1 bI, root_tag", [self.root_tag]),
-            SimpleEntry("Second Text", "Comment1 bI, t1", [t1]),
-            SimpleEntry("Third Text", "Comment1 bI, t2", [t2]),
-            SimpleEntry("Fourth Text", "Comment1 bI, t11", [t11]),
-            SimpleEntry("Fifth Text", "Comment1 bI, t1, t2", [t1, t2]),
-            SimpleEntry("Sixth Text", "Comment1 bI, t2, t11", [t2, t11]),
-            LinkEntry("http://google.ru", "comment", [t1])
-        ]
+        self.entries = []  # type: List[AbstractEntry]
 
         self.active_tag = self.root_tag
 
+        self.ids = {0: self.root_tag}
+
+    def get_id(self, who):
+        ids = set()
+
+        for tag in LevelOrderIter(self.root_tag):
+            if hasattr(tag, 'id'):
+                ids.add(tag.id)
+
+        for entry in self.entries:
+            ids.add(entry.id)
+
+        _id = id(who)
+        while _id in ids:
+            _id = randint(1000000000)
+        return _id
+
     def up(self):
         self.active_tag = self.active_tag.parent or self.root_tag
+
+    def get_by_id(self, _id: int):
+        for tag in LevelOrderIter(self.root_tag):
+            if tag.id == _id:
+                return tag
+
+        for entry in self.entries:
+            if entry.id == _id:
+                return entry
+
+        return None
 
     @property
     def items(self):
@@ -78,10 +96,22 @@ class TagManager:
             "entries": [entry.__json__() for entry in self.entries]
         }
 
+    def __from_json__(self, data: dict):
+        for tag_data in data['tags']:
+            tag = Tag.__from_json__(self, tag_data)
+            if tag.id == -1:
+                self.root_tag = tag
+                self.active_tag = self.root_tag
+                tag._manager = self
+
+        for entry_data in data['entries']:
+            self.entries.append(AbstractEntry.__from_json__(self, entry_data))
+
     def save(self):
         try:
             shutil.copyfile(FILE_DB, ".{}.backup".format(FILE_DB))
         except FileNotFoundError:
             pass
+        f = open(FILE_DB, "wt")
         json.dump(self.__json__(), open(FILE_DB, "wt"), indent=4)
-
+        f.close()

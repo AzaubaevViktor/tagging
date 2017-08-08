@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-
+import json
 import locale
 
 import os
 
+from settings import FILE_DB
 from tag import TagManager
 
 locale.setlocale(locale.LC_ALL, '')
@@ -22,6 +23,7 @@ def main(stdscr):
     cw.init(stdscr)
 
     tag_manager = TagManager()
+    tag_manager.__from_json__(json.load(open(FILE_DB)))
 
     menu = Menu(stdscr, tag_manager)
     # menu.items = [item1, item2, item3, link, file]

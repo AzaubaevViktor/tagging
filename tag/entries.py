@@ -6,13 +6,17 @@ import lxml.html
 from menu import AbstractItemType, SimpleItem, LinkItem, FileItem
 from .tag import Tag
 
+_classes = {}
+
 
 class AbstractEntry(metaclass=abc.ABCMeta):
     fields = ()
 
     @abc.abstractmethod
     def __init__(self, name):
+        self.id = None
         self.name = name
+        self._tags = set()
 
     @property
     def tags(self):
@@ -34,8 +38,8 @@ class AbstractEntry(metaclass=abc.ABCMeta):
 
     def __json__(self):
         data = {
-            "id": id(self),
-            "tags": [id(tag) for tag in self.tags],
+            "id": self.id,
+            "tags": [tag.id for tag in self.tags],
             "class": self.__class__.__name__
         }
 
@@ -43,6 +47,20 @@ class AbstractEntry(metaclass=abc.ABCMeta):
             data[field] = getattr(self, field)
 
         return data
+
+    @classmethod
+    def __from_json__(cls, manager, data):
+        cls = _classes[data['class']]
+
+        kwargs = {k: data[k] for k in cls.fields}
+        kwargs['tags'] = [manager.get_by_id(_id) for _id in data['tags']]
+        entry = cls(**kwargs)
+        entry.id = data['id']
+        return entry
+
+    @classmethod
+    def register(cls):
+        _classes[cls.__name__] = cls
 
 
 class SimpleEntry(AbstractEntry):
@@ -57,6 +75,8 @@ class SimpleEntry(AbstractEntry):
     @property
     def item(self) -> AbstractItemType:
         return SimpleItem(self, self.name, self.comment)
+
+SimpleEntry.register()
 
 
 class LinkEntry(SimpleEntry):
@@ -90,6 +110,8 @@ class LinkEntry(SimpleEntry):
     def item(self) -> AbstractItemType:
         return LinkItem(self, self.name, self.comment, self.link)
 
+LinkEntry.register()
+
 
 class FileEntry(SimpleEntry):
     fields = ('path', 'comment')
@@ -101,3 +123,5 @@ class FileEntry(SimpleEntry):
     @property
     def item(self) -> AbstractItemType:
         return FileItem(self, self.name, self.comment, self.path)
+
+FileEntry.register()

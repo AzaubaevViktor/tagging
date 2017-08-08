@@ -8,16 +8,22 @@ from menu import TagItem
 class Tag(anytree.NodeMixin):
     separator = " > "
     fields = ('name', )
+    ROOT_ID = -1
 
-    def __init__(self, name, parent=None):
+    def __init__(self, name, parent=None, _id=None):
         super().__init__()
         self.name = name
         self._entries = set()  # type: Set[SimpleEntry]
         self.parent = parent
         self._manager = None
 
+        if parent is None:
+            self.id = self.ROOT_ID
+        else:
+            self.id = _id or self.manager.get_id(self)
+
     @property
-    def manager(self):
+    def manager(self) -> "TagManager":
         return self.root._manager
 
     @property
@@ -40,10 +46,16 @@ class Tag(anytree.NodeMixin):
 
     def __json__(self):
         return {
-            "id": id(self),
+            "id": self.id,
             "name": self.name,
-            "parent": id(self.parent) if self.parent is not None else -1
+            "parent": self.parent.id if self.parent is not None else 0
         }
+
+    @classmethod
+    def __from_json__(cls, manager: "TagManger", data: dict):
+        parent_id = data['parent']
+        parent = None if 0 == parent_id else manager.get_by_id(parent_id)
+        return Tag(data['name'], parent, _id=data['id'])
 
     def __str__(self):
         return self.name
