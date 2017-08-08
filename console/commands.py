@@ -54,14 +54,14 @@ class BaseCommand:
         return {key: value or "" for key, value in it.zip_longest(self._args, args)}
 
     def about(self, *args, **kwargs):
-        _args = self.arguments(*args, **kwargs)
+        argkv = self.arguments(*args, **kwargs)
 
         about = self._about or self.console_path()
 
         _arg_s = []
 
         for key in self._args:
-            value = _args[key]
+            value = argkv[key]
             _arg_s.append("<{}{}>".format(
                 key,
                 ":" + value if value else value
@@ -84,6 +84,13 @@ class Item(BaseCommand):
     name = "Item"
     parent = base_cmd
 
+    def tag_predict(self, tag_name, **kwargs) -> Tag:
+        manager = kwargs['manager']
+
+        for tag in LevelOrderIter(manager.root_tag, filter_=lambda n: bool(n.name)):
+            if tag.name.startswith(tag_name):
+                return tag
+
 item = Item()
 
 
@@ -96,16 +103,16 @@ class ItemEdit(Item):
     box_size = (0.8, 0.8)
 
     def arguments(self, *args, **kwargs):
-        _args = super().arguments(*args, **kwargs)
-        field_value = _args['field']
+        argkv = super().arguments(*args, **kwargs)
+        field_value = argkv['field']
         menu = kwargs['menu']  # type: "Menu"
         entry = menu.active_item.source  # type: "SimpleEntry"
 
         for field_name in entry.fields:
             if field_name.startswith(field_value):
-                _args['field'] = field_name
+                argkv['field'] = field_name
 
-        return _args
+        return argkv
 
     def __call__(self, *args, **kwargs):
         args = self.arguments(*args, **kwargs)
@@ -142,7 +149,40 @@ class ItemEdit(Item):
 
         menu.update_items()
 
-ItemEdit()
+item_edit = ItemEdit()
+
+
+class ItemEditParent(ItemEdit):
+    name = "Parent"
+    parent = item_edit
+    _args = ('parent', )
+
+    def arguments(self, *args, **kwargs):
+        argkv = BaseCommand.arguments(self, *args, **kwargs)
+        tag_name = argkv['parent']
+
+        if tag_name:
+            parent = self.tag_predict(tag_name, **kwargs)
+            if parent:
+                argkv['parent'] = parent.name
+            else:
+                argkv['parent'] = ""
+
+        return argkv
+
+    def __call__(self, *args, **kwargs):
+        argkv = self.arguments(*args, **kwargs)
+        parent_name = argkv['parent']
+        tag = kwargs['tag']
+        manager = kwargs['manager']
+        menu = kwargs['menu']
+
+        if tag:
+            tag.parent = manager.get_tag(parent_name)
+            menu.update_items()
+
+
+ItemEditParent()
 
 
 class ItemTag(Item):
@@ -155,13 +195,6 @@ class ItemTag(Item):
             return super().about(*args, **kwargs)
         else:
             return "Don't use this with Tag"
-
-    def tag_predict(self, tag_name, **kwargs) -> Tag:
-        manager = kwargs['manager']
-
-        for tag in LevelOrderIter(manager.root_tag, filter_=lambda n: bool(n.name)):
-            if tag.name.startswith(tag_name):
-                return tag
 
 item_tag = ItemTag()
 
