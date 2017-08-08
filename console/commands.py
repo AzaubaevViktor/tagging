@@ -3,6 +3,8 @@ import curses.ascii
 import itertools as it
 from curses.textpad import rectangle, Textbox
 
+from anytree import LevelOrderIter
+
 from .my_textpad import MyTextPad
 from tag import SimpleEntry, LinkEntry
 from tag import FileEntry, Tag
@@ -141,6 +143,76 @@ class ItemEdit(Item):
         menu.update_items()
 
 ItemEdit()
+
+
+class ItemTag(Item):
+    name = "Tag"
+    parent = item
+
+    def about(self, *args, **kwargs):
+        entry = kwargs['entry']
+        if entry:
+            return super().about(*args, **kwargs)
+        else:
+            return "Don't use this with Tag"
+
+    def tag_predict(self, tag_name, **kwargs) -> Tag:
+        manager = kwargs['manager']
+
+        for tag in LevelOrderIter(manager.root_tag, filter_=lambda n: bool(n.name)):
+            if tag.name.startswith(tag_name):
+                return tag
+
+item_tag = ItemTag()
+
+
+class ItemTagAdd(ItemTag):
+    name = "Add"
+    parent = item_tag
+    _args = ("tag", "parent")
+
+    def arguments(self, *args, **kwargs):
+        argkv = super().arguments(*args, **kwargs)
+
+        tag = self.tag_predict(argkv['tag'], **kwargs)
+
+        if tag:
+            # Нашли тэг
+            argkv['tag'] = tag.name
+            argkv['parent'] = ""
+        else:
+            # Не нашли -- делаем подсказку для parent
+            parent_name = argkv['parent']
+            # Если туда что-то написано
+            if parent_name:
+                parent = self.tag_predict(parent_name, **kwargs)
+                if parent:
+                    argkv['parent'] = parent.name
+                else:
+                    argkv['parent'] = ""
+
+        return argkv
+
+    def __call__(self, *args, **kwargs):
+        entry = kwargs['entry']
+        if not entry:
+            return
+
+        argkv = self.arguments(*args, **kwargs)
+        tag_name = argkv['tag']
+
+        manager = kwargs['manager']
+        menu = kwargs['menu']
+
+        tag = manager.get_tag(tag_name)
+
+        if not tag:
+            tag = Tag(tag_name, parent=manager.get_tag(argkv['parent'] or None))
+
+        entry.add_tag(tag)
+        menu.update_items()
+
+ItemTagAdd()
 
 
 class ItemDelete(Item):

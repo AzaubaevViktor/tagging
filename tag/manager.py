@@ -1,3 +1,5 @@
+from anytree import LevelOrderIter
+
 from .entries import SimpleEntry, LinkEntry
 from .tag import Tag
 
@@ -37,6 +39,15 @@ class TagManager:
 
         return items
 
+    def get_tag(self, name: str):
+        for tag in LevelOrderIter(self.root_tag, filter_=lambda n: bool(n.name)):
+            if name == tag.name:
+                return tag
+
+        return None
+
+
+
     @property
     def path(self):
         tag = self.active_tag
@@ -45,7 +56,7 @@ class TagManager:
     def add_item_to_cur_tag(self, item):
         if isinstance(item, SimpleEntry):
             item.add_tag(self.active_tag)
-        if isinstance(item,g):
+        if isinstance(item, Tag):
             item.parent = self.active_tag
 
     def delete_item(self, item):
@@ -58,8 +69,3 @@ class TagManager:
         elif isinstance(item, SimpleEntry):
             for tag in item.tags:
                 tag.remove_entry(item)
-
-
-
-
-

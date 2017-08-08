@@ -11,7 +11,6 @@ KEY_ENTER = 10
 
 
 class Menu:
-
     def __init__(self, stdscr, tag_manager: "TagManager"):
         self.stdscr = stdscr
         self.manager = tag_manager

@@ -35,3 +35,11 @@ class Tag(anytree.NodeMixin):
     @property
     def item(self):
         return TagItem(self, self.manager)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "<Tag `{}`>".format(self.separator.join(
+            [tag.name for tag in self.path]
+        ))

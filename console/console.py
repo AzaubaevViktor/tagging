@@ -1,6 +1,7 @@
 import curses
 
 from curses_wrapper import colors
+from tag import SimpleEntry, Tag
 
 from .commands import base_cmd
 
@@ -78,10 +79,16 @@ class Console:
 
     @property
     def env(self):
+        item_source = self.menu.active_item.source
+
         return {
             'stdscr': self.stdscr,
             'menu': self.menu,
             'manager': self.menu.manager,
+            'item': self.menu.active_item,
+            'item_source': item_source,
+            'entry': item_source if isinstance(item_source, SimpleEntry) else None,
+            'tag': item_source if isinstance(item_source, Tag) else None,
             'console': self
         }
 
