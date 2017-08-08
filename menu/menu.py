@@ -3,6 +3,8 @@ from typing import List
 
 from settings import HELLO_HEADER
 from curses_wrapper import colors
+from natsort import natsorted, ns
+
 from .items import TagItem
 from .statuses import NEED_KEY, NEED_EXIT
 
@@ -44,6 +46,7 @@ class Menu:
     @items.setter
     def items(self, items):
         self._items = items
+        self._items = natsorted(self._items, alg=ns.IGNORECASE, key=lambda x: x.name)
         self.pos = 0
 
     @property
