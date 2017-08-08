@@ -8,6 +8,7 @@ from anytree import LevelOrderIter
 from settings import FILE_DB
 from .entries import AbstractEntry
 from .tag import Tag
+from copy import copy
 
 
 class TagManager:
@@ -84,12 +85,12 @@ class TagManager:
     def delete_item(self, item):
         if isinstance(item, Tag):
             item.parent = None
-            for child in item.children:
+            for child in copy(item.children):
                 self.delete_item(child)
-            for entry in item.entries:
+            for entry in copy(item.entries):
                 entry.remove_tag(item)
         elif isinstance(item, AbstractEntry):
-            for tag in item.tags:
+            for tag in copy(item.tags):
                 tag.remove_entry(item)
 
     def __json__(self):
