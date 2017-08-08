@@ -79,7 +79,7 @@ class Console:
 
     @property
     def env(self):
-        item_source = self.menu.active_item.source
+        item_source = self.menu.active_item and self.menu.active_item.source
 
         return {
             'stdscr': self.stdscr,

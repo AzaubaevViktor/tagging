@@ -58,6 +58,8 @@ class Menu:
 
     @property
     def active_item(self) -> "menu.AbstractItemType":
+        if not self.items:
+            return None
         return self.items[self.pos]
 
     def delete_item(self):

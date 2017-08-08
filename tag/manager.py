@@ -6,13 +6,13 @@ from typing import List
 from anytree import LevelOrderIter
 
 from settings import FILE_DB
-from .entries import SimpleEntry, LinkEntry, AbstractEntry
+from .entries import AbstractEntry
 from .tag import Tag
 
 
 class TagManager:
     def __init__(self):
-        self.root_tag = Tag("", _id=Tag.ROOT_ID)
+        self.root_tag = Tag("Root", _id=Tag.ROOT_ID)
         self.root_tag._manager = self
 
         self.entries = []  # type: List[AbstractEntry]

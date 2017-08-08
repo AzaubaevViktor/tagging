@@ -6,7 +6,7 @@ from menu import TagItem
 
 
 class Tag(anytree.NodeMixin):
-    separator = " > "
+    separator = '/'
     fields = ('name', )
     ROOT_ID = -1
 
