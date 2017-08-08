@@ -71,11 +71,12 @@ class Console:
     def render(self):
         self.a += 1
         line = "> " + self.line
+        help = self.get_help()
 
         self.win.clear()
         self.win.addstr(0, 0, "=" * self.width)
-        self.win.addstr(1, 0, line, colors.TEXT)
-        self.win.addstr(2, 0, self.get_help(), colors.COMMENT)
+        self.win.addstr(1, 0, line[max(0, len(line) - self.width):], colors.TEXT)
+        self.win.addstr(2, 0, help[max(0, len(help) - self.width + 1):], colors.COMMENT)
 
     @property
     def env(self):
