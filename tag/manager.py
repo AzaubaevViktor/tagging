@@ -108,7 +108,8 @@ class TagManager:
                 tag._manager = self
 
         for entry_data in data['entries']:
-            self.entries.append(AbstractEntry.__from_json__(self, entry_data))
+            if entry_data['tags']:
+                self.entries.append(AbstractEntry.__from_json__(self, entry_data))
 
     def save(self):
         try:
