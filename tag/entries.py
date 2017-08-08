@@ -96,7 +96,7 @@ class LinkEntry(SimpleEntry):
     @link.setter
     def link(self, val):
         val = str(val)
-        if "http://" not in val:
+        if ("http://" not in val) and ("https://" not in val):
             val = "http://" + val
 
         if not self.name:
