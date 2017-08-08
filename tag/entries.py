@@ -117,8 +117,21 @@ class FileEntry(SimpleEntry):
     fields = ('path', 'comment')
 
     def __init__(self, path: str, comment: str, tags: List[Tag] = None):
+        self._path = ""
         self.path = path
-        super().__init__(path.split("/")[-1], comment, tags)
+        super().__init__(self.name, comment, tags)
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, path):
+        if len(path) != 1 and path[-1] == '/':
+            path = path[-1]
+
+        self._path = path
+        self.name = path.split("/")[-1]
 
     @property
     def item(self) -> AbstractItemType:
