@@ -55,7 +55,6 @@ class TagManager:
         items = []
         for tag in self.active_tag.children:
             items.append(tag.item)
-
         for entry in self.active_tag.entries:
             items.append(entry.item)
 
@@ -78,6 +77,7 @@ class TagManager:
             item.add_tag(self.active_tag)
         if isinstance(item, Tag):
             item.parent = self.active_tag
+            item.id = self.get_id(item)
 
     def delete_item(self, item):
         if isinstance(item, Tag):

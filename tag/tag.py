@@ -17,10 +17,7 @@ class Tag(anytree.NodeMixin):
         self.parent = parent
         self._manager = None
 
-        if parent is None:
-            self.id = self.ROOT_ID
-        else:
-            self.id = _id or self.manager.get_id(self)
+        self.id = _id or (self.manager and self.manager.get_id(self))
 
     @property
     def manager(self) -> "TagManager":
