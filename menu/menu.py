@@ -66,18 +66,35 @@ class Menu:
         self.manager.delete_item(self.active_item.source)
         self.update_items()
 
+    def _get_start_item(self):
+        """ Для красивой прокрутки """
+        size = (self.height - 5) // 2
+        start_item = 0
+        if self.pos < size // 2:
+           pass
+        elif self.pos > len(self.items) - size + size // 2:
+            start_item = max(len(self.items) - size, 0)
+        else:
+            start_item = self.pos - size // 2
+
+        return start_item, start_item + size
+
     def render(self):
         self.stdscr.addstr(0, 0, self.manager.path)
         self.stdscr.addstr(1, 0, "=" * self.width)
         self.stdscr.addstr(0, self.width - len(HELLO_HEADER) - 1, HELLO_HEADER)
 
-        for i, item in enumerate(self.items):
+        start_item, end_item = self._get_start_item()
+
+        for i, item in zip(
+                range(start_item, end_item),
+                self.items[start_item:end_item]):
             color = colors.ACTIVE_TEXT if i == self.pos else colors.TEXT
 
             if isinstance(self.items[i], TagItem):
                 color |= curses.A_BOLD
 
-            y = (i + 1) * 2
+            y = ((i - start_item) + 1) * 2
             self.stdscr.addstr(y, 0, "{:}: {}".format(i, item.name), color)
             self.stdscr.addstr(y + 1, 2, item.comment, colors.COMMENT)
 
