@@ -1,3 +1,4 @@
+import abc
 from typing import List
 
 import lxml.html
@@ -6,14 +7,12 @@ from menu import AbstractItemType, SimpleItem, LinkItem, FileItem
 from .tag import Tag
 
 
-class SimpleEntry:
-    fields = ('name', 'comment')
+class AbstractEntry(metaclass=abc.ABCMeta):
+    fields = ()
 
-    def __init__(self, name: str, comment: str, tags: List[Tag] = None):
+    @abc.abstractmethod
+    def __init__(self, name):
         self.name = name
-        self.comment = comment
-        self._tags = set()
-        self.add_tags(tags or [])
 
     @property
     def tags(self):
@@ -33,20 +32,31 @@ class SimpleEntry:
             self._tags.remove(tag)
             tag.remove_entry(self)
 
-    @property
-    def item(self) -> AbstractItemType:
-        return SimpleItem(self, self.name, self.comment)
-
     def __json__(self):
         data = {
             "id": id(self),
-            "tags": [id(tag) for tag in self.tags]
+            "tags": [id(tag) for tag in self.tags],
+            "class": self.__class__.__name__
         }
 
         for field in self.fields:
             data[field] = getattr(self, field)
 
         return data
+
+
+class SimpleEntry(AbstractEntry):
+    fields = ('name', 'comment')
+
+    def __init__(self, name: str, comment: str, tags: List[Tag] = None):
+        self.name = name
+        self.comment = comment
+        self._tags = set()
+        self.add_tags(tags or [])
+
+    @property
+    def item(self) -> AbstractItemType:
+        return SimpleItem(self, self.name, self.comment)
 
 
 class LinkEntry(SimpleEntry):
