@@ -73,11 +73,13 @@ class TagManager:
         return tag.separator.join([str(node.name) for node in tag.path]) or tag.separator
 
     def add_item_to_cur_tag(self, item):
+        item.id = self.get_id(item)
+
         if isinstance(item, AbstractEntry):
             item.add_tag(self.active_tag)
+            self.entries.append(item)
         if isinstance(item, Tag):
             item.parent = self.active_tag
-            item.id = self.get_id(item)
 
     def delete_item(self, item):
         if isinstance(item, Tag):
