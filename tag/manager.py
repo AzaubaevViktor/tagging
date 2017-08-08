@@ -4,7 +4,7 @@ import shutil
 from anytree import LevelOrderIter
 
 from settings import FILE_DB
-from .entries import SimpleEntry, LinkEntry
+from .entries import SimpleEntry, LinkEntry, AbstractEntry
 from .tag import Tag
 
 
@@ -56,7 +56,7 @@ class TagManager:
         return tag.separator.join([str(node.name) for node in tag.path]) or tag.separator
 
     def add_item_to_cur_tag(self, item):
-        if isinstance(item, SimpleEntry):
+        if isinstance(item, AbstractEntry):
             item.add_tag(self.active_tag)
         if isinstance(item, Tag):
             item.parent = self.active_tag
@@ -68,7 +68,7 @@ class TagManager:
                 self.delete_item(child)
             for entry in item.entries:
                 entry.remove_tag(item)
-        elif isinstance(item, SimpleEntry):
+        elif isinstance(item, AbstractEntry):
             for tag in item.tags:
                 tag.remove_entry(item)
 

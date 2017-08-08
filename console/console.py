@@ -1,7 +1,7 @@
 import curses
 
 from curses_wrapper import colors
-from tag import SimpleEntry, Tag
+from tag import Tag, AbstractEntry
 
 from .commands import base_cmd
 
@@ -87,7 +87,7 @@ class Console:
             'manager': self.menu.manager,
             'item': self.menu.active_item,
             'item_source': item_source,
-            'entry': item_source if isinstance(item_source, SimpleEntry) else None,
+            'entry': item_source if isinstance(item_source, AbstractEntry) else None,
             'tag': item_source if isinstance(item_source, Tag) else None,
             'console': self
         }
