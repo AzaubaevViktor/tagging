@@ -4,6 +4,11 @@ from curses.textpad import Textbox
 
 
 class MyTextPad(Textbox):
+    ignored_keys = {
+        curses.KEY_PPAGE,  # Page Up
+        curses.KEY_NPAGE,  # Page Down
+    }
+
     def __init__(self, win, default):
         super().__init__(win)
 
@@ -55,6 +60,12 @@ class MyTextPad(Textbox):
             self.line = self.line[:self.pos] + self.line[self.pos + 1:]
         elif curses.KEY_UP == ordch:
             self.pos -= self.maxx
+        elif curses.KEY_HOME == ordch:
+            self.pos = 0
+        elif curses.KEY_END == ordch:
+            self.pos = len(self.line)
+        elif ordch in self.ignored_keys:
+            pass
         elif '\n' == ch:
                 return 0
         elif 27 == ordch:
