@@ -74,7 +74,7 @@ class Menu:
         size = (self.height - 5) // 2
         start_item = 0
         if self.pos < size // 2:
-           pass
+            pass
         elif self.pos > len(self.items) - size + size // 2:
             start_item = max(len(self.items) - size, 0)
         else:
@@ -103,11 +103,12 @@ class Menu:
             header_low = item.header_low
             about = item.about
 
-            self.stdscr.addstr(y, 0, "{:}: {}".format(i, header), color)
-            self.stdscr.addstr(y, len(header) + 1 + len(str(i)) + 2,
-                               header_low[:self.width - len(header) - len(str(i)) - 3],
-                               colors.COMMENT
-                               )
+            self.stdscr.addstr(y, 0, "{:}: {}".format(i, header[:self.width - 4]), color)
+            if len(header) < self.width - 4:
+                self.stdscr.addstr(y, len(header) + 1 + len(str(i)) + 2,
+                                   header_low[:self.width - len(header) - len(str(i)) - 3],
+                                   colors.COMMENT
+                                   )
             self.stdscr.move(y+1, 2)
             if not isinstance(item, TagItem):
                 s = "&3" + " ".join(["_{}_".format(tag_name) for tag_name in item.tags]) + " "
