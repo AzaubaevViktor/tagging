@@ -30,3 +30,33 @@ def _init_colors():
 
     curses.init_pair(3, 8, -1)  # Gray on Black
     colors.COMMENT = curses.color_pair(3)
+
+
+def print_effect(scr, y, x, s: str, control_ch="&"):
+    style = curses.A_NORMAL
+    color = 0
+    scr.move(y, x)
+
+    control_mode = False
+
+    for ch in s:
+        if not control_mode:
+            if "_" == ch:
+                style ^= curses.A_UNDERLINE
+            elif "*" == ch:
+                style ^= curses.A_BOLD
+            elif control_ch == ch:
+                control_mode = True
+            else:
+                scr.addch(ch, color | style)
+        else:
+            if '0' <= ch <= '9':
+                color = curses.color_pair(int(ch))
+            elif '&' == ch:
+                scr.addch(ch, color | style)
+            elif '_' == ch:
+                scr.addch(ch, color | style)
+            elif '*' == ch:
+                scr.addch(ch, color | style)
+
+            control_mode = False

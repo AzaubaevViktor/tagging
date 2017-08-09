@@ -2,10 +2,10 @@ import curses
 from typing import List
 
 from settings import HELLO_HEADER
-from curses_wrapper import colors
+from curses_wrapper import colors, print_effect
 from natsort import natsorted, ns
 
-from .items import TagItem
+from .items import TagItem, AbstractItemType
 from .statuses import NEED_KEY, NEED_EXIT
 
 KEY_ESC = 27
@@ -108,8 +108,12 @@ class Menu:
                                header_low[:self.width - len(header) - len(str(i)) - 3],
                                colors.COMMENT
                                )
+            self.stdscr.move(y+1, 2)
+            if not isinstance(item, TagItem):
+                s = "&3" + " ".join(["_{}_".format(tag_name) for tag_name in item.tags]) + " "
+                print_effect(self.stdscr, y+1, 2, s)
 
-            self.stdscr.addstr(y + 1, 2, item.about, colors.COMMENT)
+            self.stdscr.addstr(item.about, colors.COMMENT)
 
     def key_handle(self, key):
         key = ord(key) if isinstance(key, str) else key

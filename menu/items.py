@@ -17,7 +17,7 @@ class AbstractItemType(metaclass=abc.ABCMeta):
         if hasattr(self, 'source') and isinstance(self.source, AbstractEntry):
             entry = self.source
             tags_list = [tag.name for tag in entry.tags]
-            return str(tags_list)
+            return tags_list
 
     def press(self):
         pass
@@ -37,7 +37,7 @@ class AbstractItemType(metaclass=abc.ABCMeta):
 
 class SimpleItem(AbstractItemType):
     _header_fmt = "{name}"
-    _about_fmt = "{tags} {comment}"
+    _about_fmt = "{comment}"
 
     def __init__(self,
                  source,
@@ -56,7 +56,7 @@ class SimpleItem(AbstractItemType):
 class LinkItem(AbstractItemType):
     _header_fmt = "{name}"
     _header_low_fmt = "{link}"
-    _about_fmt = "{tags} {comment}"
+    _about_fmt = "{comment}"
 
     def __init__(
             self,
@@ -78,7 +78,7 @@ class LinkItem(AbstractItemType):
 class FileItem(AbstractItemType):
     _header_fmt = "{name}"
     _header_low_fmt = "({path})"
-    _about_fmt = "{tags} {comment}"
+    _about_fmt = "{comment}"
 
     def __init__(
             self,
