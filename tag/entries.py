@@ -1,5 +1,6 @@
 import abc
 from typing import List
+from urllib.parse import urlparse, unquote
 
 import lxml.html
 
@@ -93,20 +94,31 @@ class LinkEntry(SimpleEntry):
     def link(self):
         return self._link
 
+    def _get_name(self, url):
+        up = urlparse(url)
+        netloc = up.netloc
+
+        path = up.path
+        if path and path[-1] == '/':
+            path = path[:-1]
+        page = unquote((path.split("/") or [""])[-1])
+        page = page.replace("_", " ")
+        return netloc + ": " + page
+
     @link.setter
-    def link(self, val):
-        val = str(val)
-        if ("http://" not in val) and ("https://" not in val):
-            val = "http://" + val
+    def link(self, url):
+        url = str(url)
+        if ("http://" not in url) and ("https://" not in url):
+            url = "http://" + url
 
         if not self.name:
             try:
-                t = lxml.html.parse(val)
+                t = lxml.html.parse(url)
                 self.name = t.find(".//title").text.strip()
             except Exception:
-                self.name = val
+                self.name = self._get_name(url)
 
-        self._link = val
+        self._link = url
 
     @property
     def item(self) -> AbstractItemType:
