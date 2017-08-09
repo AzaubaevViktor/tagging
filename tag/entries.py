@@ -118,6 +118,9 @@ class LinkEntry(SimpleEntry):
             except Exception:
                 self.name = self._get_name(url)
 
+        self.name = self.name.replace("\n", "").replace("\r", "")
+        self.name.strip()
+
         self._link = url
 
     @property
