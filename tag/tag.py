@@ -38,7 +38,7 @@ class Tag(anytree.NodeMixin):
             entry.remove_tag(self)
 
     @property
-    def item(self):
+    def item(self) -> TagItem:
         return TagItem(self, self.manager)
 
     def __json__(self):

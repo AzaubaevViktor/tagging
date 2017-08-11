@@ -22,7 +22,7 @@ class TagManager:
 
         self.ids = {0: self.root_tag}
 
-    def get_id(self, who):
+    def get_id(self, who) -> int:
         ids = set()
 
         for tag in LevelOrderIter(self.root_tag):
@@ -40,7 +40,7 @@ class TagManager:
     def up(self):
         self.active_tag = self.active_tag.parent or self.root_tag
 
-    def get_by_id(self, _id: int):
+    def get_by_id(self, _id: int) -> Tag or AbstractEntry or None:
         for tag in LevelOrderIter(self.root_tag):
             if tag.id == _id:
                 return tag
@@ -52,7 +52,7 @@ class TagManager:
         return None
 
     @property
-    def items(self):
+    def items(self) -> List[Tag or AbstractEntry]:
         items = []
         for tag in self.active_tag.children:
             items.append(tag.item)
@@ -61,7 +61,7 @@ class TagManager:
 
         return items
 
-    def get_tag(self, name: str):
+    def get_tag(self, name: str) -> Tag or None:
         for tag in LevelOrderIter(self.root_tag, filter_=lambda n: bool(n.name)):
             if name == tag.name:
                 return tag
@@ -69,11 +69,11 @@ class TagManager:
         return None
 
     @property
-    def path(self):
+    def path(self) -> str:
         tag = self.active_tag
         return tag.separator.join([str(node.name) for node in tag.path]) or tag.separator
 
-    def add_item_to_cur_tag(self, item):
+    def add_item_to_cur_tag(self, item: Tag or AbstractEntry):
         item.id = self.get_id(item)
 
         if isinstance(item, AbstractEntry):
@@ -82,7 +82,7 @@ class TagManager:
         if isinstance(item, Tag):
             item.parent = self.active_tag
 
-    def delete_item(self, item):
+    def delete_item(self, item: Tag or AbstractEntry):
         if isinstance(item, Tag):
             item.parent = None
             for child in copy(item.children):

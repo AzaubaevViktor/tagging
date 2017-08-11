@@ -1,5 +1,5 @@
 import abc
-from typing import List
+from typing import List, Set, Iterable
 from urllib.parse import urlparse, unquote
 
 import lxml.html
@@ -20,7 +20,7 @@ class AbstractEntry(metaclass=abc.ABCMeta):
         self._tags = set()
 
     @property
-    def tags(self):
+    def tags(self) -> Set[Tag]:
         return self._tags
 
     def add_tag(self, tag: Tag):
@@ -28,7 +28,7 @@ class AbstractEntry(metaclass=abc.ABCMeta):
             self._tags.add(tag)
             tag.add_entry(self)
 
-    def add_tags(self, tags: List[Tag]):
+    def add_tags(self, tags: Iterable[Tag]):
         for tag in tags:
             self.add_tag(tag)
 
@@ -50,7 +50,7 @@ class AbstractEntry(metaclass=abc.ABCMeta):
         return data
 
     @classmethod
-    def __from_json__(cls, manager, data):
+    def __from_json__(cls, manager: "Manager", data: "dict"):
         cls = _classes[data['class']]
 
         kwargs = {k: data.get(k, "") for k in cls.fields}

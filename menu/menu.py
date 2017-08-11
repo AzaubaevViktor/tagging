@@ -17,18 +17,18 @@ class Menu:
         self.stdscr = stdscr
         self.manager = tag_manager
 
-        self._items = []  # type: List["AbstractItemType"]
+        self._items = []  # type: List[AbstractItemType]
 
         self.update_items()
 
         self._pos = 0
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self.stdscr.getmaxyx()[1]
 
     @property
-    def height(self):
+    def height(self) -> int:
         return self.stdscr.getmaxyx()[0]
 
     def update_items(self):
@@ -36,7 +36,7 @@ class Menu:
         self.manager.save()
 
     @property
-    def items(self):
+    def items(self) -> List[AbstractItemType]:
         return self._items
 
     def add_item(self, item):
@@ -60,7 +60,7 @@ class Menu:
             self._pos = value % length
 
     @property
-    def active_item(self) -> "menu.AbstractItemType":
+    def active_item(self) -> AbstractItemType:
         if not self.items:
             return None
         return self.items[self.pos]
