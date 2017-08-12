@@ -4,6 +4,7 @@ import itertools as it
 from curses.textpad import rectangle, Textbox
 
 from anytree import LevelOrderIter
+from natsort import natsorted, ns
 
 from .my_textpad import MyTextPad
 from tag import SimpleEntry, LinkEntry
@@ -86,8 +87,9 @@ class Item(BaseCommand):
 
     def tag_predict(self, tag_name, **kwargs) -> Tag:
         manager = kwargs['manager']
+        tags = [tag for tag in LevelOrderIter(manager.root_tag, filter_=lambda n: bool(n.name))]
 
-        for tag in LevelOrderIter(manager.root_tag, filter_=lambda n: bool(n.name)):
+        for tag in natsorted(tags, alg=ns.IGNORECASE, key=lambda x: x.name):
             if tag.name.startswith(tag_name):
                 return tag
 
