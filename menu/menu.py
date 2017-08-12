@@ -19,7 +19,7 @@ class Menu:
 
         self._items = []  # type: List[AbstractItemType]
 
-        self.update_items()
+        self.update_items(reset_position=True)
 
         self._pos = 0
 
@@ -31,9 +31,15 @@ class Menu:
     def height(self) -> int:
         return self.stdscr.getmaxyx()[0]
 
-    def update_items(self):
+    def update_items(self, reset_position=False):
         self.items = self.manager.items
         self.manager.save()
+        if reset_position:
+            self.pos = 0
+        else:
+            # Сделано для корректного обновления позиции в случае изменения
+            # количества элементов
+            self.pos = self.pos
 
     @property
     def items(self) -> List[AbstractItemType]:
@@ -47,7 +53,6 @@ class Menu:
     def items(self, items):
         self._items = items
         self._items = natsorted(self._items, alg=ns.IGNORECASE, key=lambda x: x.name)
-        self.pos = 0
 
     @property
     def pos(self):
@@ -60,7 +65,7 @@ class Menu:
             self._pos = value % length
 
     @property
-    def active_item(self) -> AbstractItemType:
+    def active_item(self) -> AbstractItemType or None:
         if not self.items:
             return None
         return self.items[self.pos]
@@ -126,11 +131,13 @@ class Menu:
         elif KEY_ESC == key:
             return NEED_EXIT
         elif ord('\n') == key or curses.KEY_RIGHT == key:
-            self.items and self.items[self.pos].press()
-            self.update_items()
+            reset_position = False
+            if self.items:
+                reset_position = self.items[self.pos].press()
+            self.update_items(reset_position=reset_position)
         elif curses.KEY_LEFT == key:
             self.manager.up()
-            self.update_items()
+            self.update_items(reset_position=True)
 
         return NEED_KEY
 

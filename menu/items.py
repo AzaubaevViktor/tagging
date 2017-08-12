@@ -11,6 +11,10 @@ class AbstractItemType(metaclass=abc.ABCMeta):
     _header_low_fmt = ""
     _about_fmt = ""
 
+    @abc.abstractmethod
+    def __init__(self):
+        self.source = None  # type: "AbstractEntry" or "Tag"
+
     def _tags(self):
         from tag import AbstractEntry
 
@@ -19,8 +23,12 @@ class AbstractItemType(metaclass=abc.ABCMeta):
             tags_list = [tag.name for tag in entry.tags]
             return tags_list
 
-    def press(self):
-        pass
+    def press(self) -> bool:
+        """
+
+        :return: Необходимо сбросить позицию меню
+        """
+        return False
 
     @property
     def header_low(self) -> str:
@@ -49,8 +57,8 @@ class SimpleItem(AbstractItemType):
         self.comment = comment
         self.tags = self._tags()
 
-    def press(self):
-        pass
+    def press(self) -> bool:
+        return False
 
 
 class LinkItem(AbstractItemType):
@@ -95,6 +103,7 @@ class FileItem(AbstractItemType):
 
     def press(self):
         subprocess.run(['xdg-open', self.path])
+        return False
 
 
 class TagItem(AbstractItemType):
@@ -115,3 +124,4 @@ class TagItem(AbstractItemType):
 
     def press(self):
         self.manager.active_tag = self.source
+        return True
