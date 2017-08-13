@@ -8,6 +8,7 @@ import chardet
 
 from menu import AbstractItemType, SimpleItem, LinkItem, FileItem
 from .tag import Tag
+import magic
 
 _classes = {}
 
@@ -117,12 +118,16 @@ class LinkEntry(SimpleEntry):
             try:
                 request = urllib.request.urlopen(url)
                 data = request.read()
-                encoding = chardet.detect(data)['encoding']
-                parser = etree.HTMLParser(encoding=encoding)
-                parser.feed(data)
-                element = parser.close()
+                mime = magic.from_buffer(data, mime=True)
+                if mime == 'text/html':
+                    encoding = chardet.detect(data[:4 * 1024])['encoding']
+                    parser = etree.HTMLParser(encoding=encoding)
+                    parser.feed(data)
+                    element = parser.close()
 
-                self.name = element.find(".//title").text.strip()
+                    self.name = element.find(".//title").text.strip()
+                else:
+                    raise Exception('This is not HTML file')
             except Exception:
                 self.name = self._get_name(url)
 
