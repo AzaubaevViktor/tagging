@@ -1,8 +1,10 @@
 import abc
+import urllib.request
+from lxml import etree
 from typing import List, Set, Iterable
 from urllib.parse import urlparse, unquote
 
-import lxml.html
+import chardet
 
 from menu import AbstractItemType, SimpleItem, LinkItem, FileItem
 from .tag import Tag
@@ -113,8 +115,14 @@ class LinkEntry(SimpleEntry):
 
         if not self.name:
             try:
-                t = lxml.html.parse(url)
-                self.name = t.find(".//title").text.strip()
+                request = urllib.request.urlopen(url)
+                data = request.read()
+                encoding = chardet.detect(data)['encoding']
+                parser = etree.HTMLParser(encoding=encoding)
+                parser.feed(data)
+                element = parser.close()
+
+                self.name = element.find(".//title").text.strip()
             except Exception:
                 self.name = self._get_name(url)
 
